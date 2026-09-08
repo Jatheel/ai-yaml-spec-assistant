@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AI YAML Specification Assistant
 
 An autonomous AI agent that interprets user queries, evaluates YAML specifications, and returns structured API documentation and document guidance. The included dataset is a generic, synthetic example for demonstrating YAML-driven tool use.
@@ -85,3 +86,6 @@ The assistant returns alternative document combinations in confidence order, inc
 - Edit `data/alternative_docs.yaml` to add or revise synthetic specifications.
 - The frontend expects the API at `http://127.0.0.1:8000`; update the `API` constant in `frontend/index.html` for another local port.
 - Never commit `.env` or real supplier documents. Use `.env.example` as the credential template.
+=======
+# ai-yaml-spec-assistant
+>>>>>>> 2c908963527f71c30d3b47311437d3ff814e13f8
