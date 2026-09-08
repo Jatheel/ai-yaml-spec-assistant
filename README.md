@@ -54,6 +54,7 @@ Create a `.env` file in the project root:
 
 ```env
 GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=openai/gpt-oss-20b
 API_PORT=8000
 ```
 
@@ -84,6 +85,7 @@ The assistant returns alternative document combinations in confidence order, inc
 ## Configuration Notes
 
 - Edit `data/alternative_docs.yaml` to add or revise synthetic specifications.
+- Set `GROQ_MODEL` in `.env` to another model available to your Groq account.
 - The frontend expects the API at `http://127.0.0.1:8000`; update the `API` constant in `frontend/index.html` for another local port.
 - Never commit `.env` or real supplier documents. Use `.env.example` as the credential template.
 =======
