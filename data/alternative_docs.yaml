@@ -1,0 +1,3500 @@
+﻿# Generic synthetic specification data for demonstration and testing only.
+# It contains no supplier records, company identifiers, or confidential values.
+badges:
+- name: FSSC 22000
+  key: fssc_22000
+  mandatory_documents:
+  - FSSC 22000 Certificate
+  alternative_groups:
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Certification contract
+    - HACCP Plan & Food Safety Procedures
+    - Technical review report
+    condition: The same certification body signed at the certification contract should appear at the technical review report.The
+      HACCP Plan and records on other food safety procedures should demonstrate the organization is maintaining and concerning
+      on food safety measures.The final decision on the certification status should be appear in the technical review report.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - certification_body_name
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body is not recognized or does not match between the Certification Contract and Technical
+        Review Report. Please cross-check with the FSSC Public Register or upload a document issued by an accredited certification
+        body.
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match across the Certification Contract, HACCP Plan, and Technical Review Report.
+        Please cross-check the scope with the FSSC Public Register or upload documents with a consistent scope.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Audit Report from accredited certification body
+    - Technical review report
+    condition: Both the audit report and technical review report should be issued by the same certification body and should
+      be on the same scope,issued at a same time period and confirm the organization adhere to the applied scope of the certificate.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_version
+    - certificate_scope
+    - date_of_issuance
+    - date_of_expiry
+    - certification_body_name
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body is not recognized or does not match between documents. Please cross-check with the FSSC
+        Public Register or upload a document issued by an accredited certification body.
+    - error_type: inconsistent_date
+      action: cross_check_external_source
+      message: The issuance or expiry date is inconsistent between the Audit Report and Technical Review Report. Please cross-check
+        the date with the FSSC Quality Public Register or upload documents with consistent dates.
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match between the Audit Report and Technical Review Report. Please cross-check
+        the scope with the FSSC Quality Public Register or upload documents with a consistent scope.
+  - combination_required: true
+    score: 0.6
+    documents:
+    - Audit Report from accredited certification body
+    - Self Declaration
+    condition: Both the audit report and self declaration should be refer to the same scope of the same organization.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - date_of_issuance
+    error_recovery:
+    - error_type: corrupted_file
+      action: request_reupload
+      message: One document is unreadable. Please reupload a clear copy.
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match between the Audit Report and Self Declaration. Please cross-check the
+        scope with the FSSC Public Register or upload documents with a consistent scope.
+  - combination_required: true
+    score: 0.4
+    documents:
+    - Internal Audit Report
+    - Self Declaration
+    condition: Both the audit report and self declaration should be refer to the same scope of the same organization.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    error_recovery:
+    - error_type: corrupted_file
+      action: request_reupload
+      message: The uploaded document is unreadable. Please reupload a clear copy.
+    - error_type: missing_address
+      action: request_corrected_document
+      message: The organization address is missing in one or both documents. Please upload a corrected Internal Audit Report
+        or Self Declaration that includes the complete address (street number, street name, city, state, country).
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match between the Internal Audit Report and Self Declaration. Please cross-check
+        the scope with the FSSC Quality Public Register or upload documents with a consistent scope.
+    - error_type: missing_name
+      action: request_corrected_document
+      message: The organization name is missing in one or both documents. Please upload a corrected Internal Audit Report
+        or Self Declaration that includes the organization name.
+  available_alternative_documents:
+  - title: Certification contract
+    description: A formal agreement between the organization and the certification body. It outlines the terms and conditions
+      under which the certification is provided, including responsibilities, timelines, and scope. This document must be signed
+      by the same certification body listed in the technical review report and should include clauses covering the scope of
+      the certification, rights and obligations of both parties, and terms of validity.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: certification_body_address
+      confidence: 1
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - certification_body
+      - supplier
+      estimated_access_time: 1-3 days
+  - title: HACCP Plan & Food Safety Procedures
+    description: This document details the Hazard Analysis Critical Control Point (HACCP) system implemented by the organization
+      to ensure food safety. It should contain a thorough analysis of food safety hazards, identification of critical control
+      points, and procedures for monitoring and verification. The plan must be relevant to the scope of certification and
+      align with ISO 22000 principles. It should also outline corrective actions in case of deviations and include records
+      of food safety monitoring.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.7
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.4
+    - field: signatory_name
+      confidence: 0.4
+    - field: signatory_position
+      confidence: 0.4
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Internal Audit Report
+    description: An internal audit report is a document produced by the organization's internal personnel, typically those
+      with expertise in food safety and auditing.It offers a detailed account of audits conducted within the organization
+      to verify and analyze any gaps in compliance before the formal audits by certification bodies.This report should include
+      findings from the audit, an assessment of existing food safety practices, and a list of corrective actions or improvements
+      needed. The report should reference the current version of the food safety plan and demonstrate the commitment of the
+      organization to continuous improvement.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: signatory_name
+      confidence: 0.9
+    - field: signatory_position
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Technical review report
+    description: A technical review report is a document prepared by the certification body that evaluates the organization's
+      adherence to FSSC 22000 standards. It must reference the completed audit and confirm that the organization is compliant
+      with the required standards. The report should summarize audit findings, outline any non-conformities found, and include
+      recommendations for achieving compliance and must be signed by a leading person in the audit team.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.7
+    - field: certificate_version
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: date_of_expiry
+      confidence: 0.8
+    - field: certification_body_address
+      confidence: 0.7
+    - field: certification_body_logo
+      confidence: 1
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: rare
+      sources:
+      - certification_body
+      estimated_access_time: 3-5 days
+  - title: Audit Report from accredited certification body
+    description: An audit report prepared by an accredited certification body after conducting an official audit of the organization's
+      food safety management system. This report offers a detailed evaluation of the organization's compliance with the relevant
+      certification standards.It should include information on the audit scope, audit methodology,audit date time and duration,
+      findings, non-conformities, and any corrective actions required.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: certification_body_address
+      confidence: 1
+    - field: certification_body_logo
+      confidence: 1
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: modest
+      sources:
+      - certification_body
+      estimated_access_time: 1-3 days
+  - title: Self Declaration
+    description: A self-declaration is a formal statement made by the organization asserting that it complies with the relevant
+      standards, regulations, and requirements for certification. This document is typically signed by senior management and
+      serves as a declaration verifying some information on the organization.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.5
+    - field: certification_body_name
+      confidence: 0.5
+    - field: date_of_issuance
+      confidence: 1
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - organization
+      - supplier
+      estimated_access_time: 1 day
+- name: PrimusGFS
+  key: primusgfs
+  mandatory_documents:
+  - PrimusGFS Certificate
+  alternative_groups:
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Certification Agreement
+    - GAP/GMP/HACCP Plan
+    - Audit Reports
+    condition: The Certification Agreement must be signed by the same certification body as indicated in the Audit Reports.
+      The GAP/GMP/HACCP Plan should detail food safety practices consistent with the audit findings. The Audit Reports should
+      clearly confirm compliance with PrimusGFS standards.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - certification_body_name
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body is not recognized. Please confirm via the PrimusGFS public register or upload a valid
+        certificate.
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The scope does not match across all documents. Please verify or provide consistent scope documentation.
+  - combination_required: true
+    score: 0.5
+    documents:
+    - Internal Audit Report
+    - Self-Assessment Checklist
+    condition: Both documents must refer to the same organization and scope and demonstrate active internal compliance monitoring
+      with PrimusGFS standards.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    error_recovery:
+    - error_type: corrupted_file
+      action: request_reupload
+      message: One or both documents are unreadable. Please reupload clear copies.
+    - error_type: missing_organization_name
+      action: request_corrected_document
+      message: The organization name is missing. Upload documents with the complete name.
+    - error_type: mismatched_certificate_scope
+      action: cross_check_external_source
+      message: The scope does not match between the documents. Ensure they refer to the same food safety activities.
+  - combination_required: true
+    score: 0.4
+    documents:
+    - Supplier Audit Report
+    - Traceability Records
+    condition: Supplier Audit Report and Traceability Records must validate the same organization, same scope, and show consistent
+      traceability practices relevant to the PrimusGFS certificate.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - date_of_issuance
+    error_recovery:
+    - error_type: corrupted_file
+      action: request_reupload
+      message: A file is unreadable. Please reupload a clear version.
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: Mismatch in scope. Ensure both documents refer to the same safety scope.
+  available_alternative_documents:
+  - title: Certification Agreement
+    description: A formal, legally binding agreement between the organization and a certification body accredited by PrimusGFS.
+      This document outlines the scope of certification, responsibilities of each party, audit rights, confidentiality terms,
+      corrective action expectations, validity period, and consequences of non-compliance. It must be duly signed by both
+      the organization and the accredited certification body listed in the final audit report.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: certification_body_address
+      confidence: 1
+    - field: date_of_agreement
+      confidence: 1
+    - field: scope_of_certification
+      confidence: 1
+    - field: date_of_expiry
+      confidence: 1
+    - field: signatory_name
+      confidence: 0.9
+    - field: signatory_position
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - certification_body
+      - organization
+      - internal_documentation
+      estimated_access_time: 1-3 business days
+  - title: GAP/GMP/HACCP Plan
+    description: A technical and structured food safety document that outlines the organization's implementation of Good Agricultural
+      Practices (GAP), Good Manufacturing Practices (GMP), and a validated Hazard Analysis and Critical Control Points (HACCP)
+      system. While this plan includes risk assessments, roles, and monitoring activities, it may only partially contain certification-related
+      metadata. Certificate details should be verified from the Certification Agreement or Final Audit Report.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.1
+    - field: organization_address
+      confidence: 0.7
+    - field: certification_body_name
+      confidence: 0.5
+    - field: certification_body_address
+      confidence: 0.5
+    - field: scope_of_certification
+      confidence: 0.5
+    - field: plan_date
+      confidence: 1
+    - field: date_of_expiry
+      confidence: 0.5
+    - field: signatory_name
+      confidence: 0.7
+    - field: signatory_position
+      confidence: 0.7
+    availability:
+      likelihood: common
+      sources:
+      - organization
+      - food_safety_team
+      estimated_access_time: 1-2 business days
+  - title: Internal Audit Report
+    description: An internal audit report conducted by the organization to verify compliance with PrimusGFS standards. It
+      includes audit dates, scope of the audit, identified nonconformities, and the corresponding corrective actions. The
+      report demonstrates the organization's internal monitoring system, commitment to food safety, and continuous improvement
+      practices. The audit must be conducted by trained personnel and should reference the applicable food safety plan and
+      relevant procedures.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.7
+    - field: certification_body_name
+      confidence: 0.5
+    - field: certification_body_address
+      confidence: 0.5
+    - field: date_of_agreement
+      confidence: 0.5
+    - field: scope_of_certification
+      confidence: 0.6
+    - field: signatory_name
+      confidence: 0.9
+    - field: signatory_position
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - quality_department
+      - food_safety_team
+      estimated_access_time: 1-2 days
+  - title: Self-Assessment Checklist
+    description: A completed checklist used by the organization to perform an internal review of its compliance with PrimusGFS
+      standards prior to the formal certification audit. It typically includes questions based on the standard, documented
+      observations, and any preliminary corrective actions taken. The checklist helps the organization proactively identify
+      gaps and prepare for the certification process.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.8
+    - field: certification_body_name
+      confidence: 0.5
+    - field: certification_body_address
+      confidence: 0.5
+    - field: scope_of_certification
+      confidence: 0.8
+    - field: signatory_name
+      confidence: 0.8
+    - field: signatory_position
+      confidence: 0.8
+    availability:
+      likelihood: moderate
+      sources:
+      - internal
+      - food_safety_team
+      estimated_access_time: 1-3 days
+  - title: Supplier Audit Report
+    description: Audit report issued by a PrimusGFS-accredited certification body after auditing a supplier's facility. The
+      report details audit findings, overall compliance score, non-conformities observed, corrective action deadlines, and
+      certifier details. It serves as key documentation for verifying supplier compliance within the supply chain.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.1
+    - field: organization_address
+      confidence: 0.6
+    - field: certification_body_name
+      confidence: 1
+    - field: certification_body_address
+      confidence: 0.6
+    - field: audit_date
+      confidence: 1
+    - field: signatory_name
+      confidence: 0.8
+    - field: signatory_position
+      confidence: 0.8
+    availability:
+      likelihood: common
+      sources:
+      - certification_body
+      - supplier
+      estimated_access_time: 3-5 days
+  - title: Traceability Records
+    description: Records that track the movement of food products through the supply chain, supporting traceability and recall
+      procedures under PrimusGFS standards.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.5
+    - field: product_id
+      confidence: 1
+    - field: batch_number
+      confidence: 1
+    - field: traceability_date
+      confidence: 1
+    - field: supply_chain_partner
+      confidence: 0.95
+    - field: signatory_name
+      confidence: 0.6
+    - field: signatory_position
+      confidence: 0.6
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-3 days
+- name: ISO 22000
+  key: iso_22000
+  mandatory_documents:
+  - ISO 22000:2018 Certificate
+  - Hazard Analysis and Critical Control Points (HACCP) Plan
+  alternative_groups:
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Food Safety Management System (FSMS) Manual
+    - Internal Audit Records
+    - Food Safety Improvement Plan
+    - Food Safety Policy
+    condition: This group collectively verifies the organization's comprehensive Food Safety Management System including scope,
+      certification body identity, internal audit effectiveness, management commitment, and continual improvement aligned
+      with ISO 22000.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - certification_body_name
+    - legal_compliance_status
+    error_recovery:
+    - error_type: missing_records
+      action: request_internal_followup
+      message: Internal Audit Records are missing or incomplete. Please provide updated audit reports.
+    - error_type: outdated_manual
+      action: request_update
+      message: The FSMS Manual is outdated or missing certification body information. Please upload the latest version.
+    - error_type: missing_policy
+      action: request_policy_submission
+      message: Food Safety Policy document is missing. Please provide the current policy.
+    - error_type: no_improvement_plan
+      action: request_creation
+      message: Food Safety Improvement Plan is not available. Please develop and submit the plan.
+  - combination_required: true
+    score: 0.7
+    documents:
+    - Food Safety Management System (FSMS) Manual
+    - Food Safety Improvement Plan
+    condition: This group partially validates the certification by demonstrating FSMS structure, document control, and commitment
+      to legal compliance and continual improvement.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - legal_compliance_status
+    error_recovery:
+    - error_type: outdated_manual
+      action: request_update
+      message: The FSMS Manual is outdated or missing certification body information. Please upload the latest version.
+    - error_type: no_improvement_plan
+      action: request_creation
+      message: Food Safety Improvement Plan is not available. Please develop and submit the plan.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Food Safety Management System (FSMS) Manual
+    - Internal Audit Records
+    - Food Safety Policy
+    condition: This group partially demonstrates certification validity by confirming organizational identity, FSMS scope,
+      audit effectiveness, and food safety commitment.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - certification_body_name
+    error_recovery:
+    - error_type: missing_records
+      action: request_internal_followup
+      message: Internal Audit Records are missing or incomplete. Please provide updated audit reports.
+    - error_type: outdated_manual
+      action: request_update
+      message: The FSMS Manual is outdated or missing certification body information. Please upload the latest version.
+    - error_type: missing_policy
+      action: request_policy_submission
+      message: Food Safety Policy document is missing. Please provide the current policy.
+  - combination_required: true
+    score: 0.7
+    documents:
+    - Internal Audit Records
+    - Food Safety Improvement Plan
+    - Food Safety Policy
+    condition: This group partially substitutes the HACCP Plan by demonstrating food safety commitment, audit-driven risk
+      control, and ongoing improvement processes aligned with hazard identification and legal compliance requirements.
+    fields_to_match:
+    - organization_name
+    - corrective_actions
+    - legal_compliance_status
+    error_recovery:
+    - error_type: missing_records
+      action: request_internal_followup
+      message: Internal Audit Records are missing or incomplete. Please provide updated audit reports.
+    - error_type: no_improvement_plan
+      action: request_creation
+      message: Food Safety Improvement Plan is not available. Please develop and submit the plan.
+    - error_type: missing_policy
+      action: request_policy_submission
+      message: Food Safety Policy document is missing. Please provide the current policy.
+  - combination_required: true
+    score: 0.7
+    documents:
+    - Internal Audit Records
+    - Food Safety Improvement Plan
+    - Food Safety Policy
+    condition: This group substitutes the HACCP Plan by showing food safety objectives, audit-driven hazard corrections, continual
+      improvement efforts, and legal compliance.
+    fields_to_match:
+    - organization_name
+    - corrective_actions
+    - legal_compliance_status
+    error_recovery:
+    - error_type: missing_records
+      action: request_internal_followup
+      message: Internal Audit Records are missing or incomplete. Please provide updated audit reports.
+    - error_type: no_improvement_plan
+      action: request_creation
+      message: Food Safety Improvement Plan is not available. Please develop and submit the plan.
+    - error_type: missing_policy
+      action: request_policy_submission
+      message: Food Safety Policy document is missing. Please provide the current policy.
+  - combination_required: true
+    score: 0.6
+    documents:
+    - Food Safety Improvement Plan
+    - Food Safety Management System (FSMS) Manual
+    condition: This group provides limited verification by demonstrating FSMS structure and legal compliance initiatives relevant
+      to hazard and risk control.
+    fields_to_match:
+    - organization_name
+    - legal_compliance_status
+    error_recovery:
+    - error_type: no_improvement_plan
+      action: request_creation
+      message: Food Safety Improvement Plan is not available. Please develop and submit the plan.
+    - error_type: outdated_manual
+      action: request_update
+      message: The FSMS Manual is outdated. Please provide the latest version.
+  available_alternative_documents:
+  - title: Internal Audit Records
+    description: Documents demonstrating the organization's internal audits of its Food Safety Management System (FSMS), verifying
+      compliance, effectiveness, and continual improvement
+    provides_fields:
+    - field: audit_date
+      confidence: 1
+    - field: auditor_name
+      confidence: 1
+    - field: organization_name
+      confidence: 1
+    - field: nonconformities_identified
+      confidence: 1
+    - field: corrective_actions
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - certification_body
+      estimated_access_time: 1-3 business days
+  - title: Food Safety Management System (FSMS) Manual
+    description: A comprehensive document detailing the organization's FSMS scope, processes, procedures, and controls, serving
+      as the primary reference for implementation and maintenance of the FSMS in accordance with ISO 22000:2018.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: fsms_scope
+      confidence: 0.9
+    - field: document_control_procedures
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - certification_body
+      estimated_access_time: 1-5 business days
+  - title: Food Safety Policy
+    description: A documented statement outlining the organization's commitment to food safety, its objectives, and the framework
+      for setting food safety goals.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: policy_statement
+      confidence: 1
+    - field: food_safety_objectives
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - certification_body
+      estimated_access_time: 1 business day
+  - title: Food Safety Improvement Plan
+    description: A documented plan outlining the organization's approach to continual improvement of the FSMS, including measurable
+      targets, actions, responsibilities, and timelines.This plan must be aligned with the certification scope and legal compliance
+      requirements.
+    provides_fields:
+    - field: improvement_targets
+      confidence: 0.9
+    - field: action_plans
+      confidence: 0.9
+    - field: responsible_personnel
+      confidence: 0.9
+    - field: review_dates
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - certification_body
+      estimated_access_time: 3-5 business days
+- name: SQF
+  key: sqf
+  mandatory_documents:
+  - SQF Certificate
+  - Audit Report by an accredited certification body
+  alternative_groups:
+  - combination_required: true
+    score: 0.9
+    documents:
+    - HACCP Plan & Food Safety Procedures
+    - Scope of Certification Document
+    - Management Commitment Evidence
+    - Food Safety and Quality Management System Records
+    condition: All documents must be issued by or refer to the same certification body and consistently match scope and organizational
+      details. The Management Commitment Evidence and System Records must demonstrate that the site maintains its food safety
+      responsibilities and governance. The Scope of Certification Document and HACCP Plan must validate the certified processes.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - certification_body_name
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body does not appear in the SQF Licensed Certification Body list. Please verify or upload
+        a certificate issued by a recognized body.
+    - error_type: mismatched_scope
+      action: cross_check_internal_consistency
+      message: Scope details are inconsistent across the supporting documents. Please confirm and reupload consistent documentation.
+  - combination_required: true
+    score: 0.85
+    documents:
+    - Scope of Certification Document
+    - Management Commitment Evidence
+    condition: These documents together verify the organization's certified scope and demonstrate top-level management's commitment
+      to maintaining SQF Code compliance, including policies and responsible personnel.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - certification_body_name
+    error_recovery:
+    - error_type: mismatched_scope
+      action: request_consistency_check
+      message: The scope of certification is inconsistent across the documents. Please recheck and upload aligned documentation.
+    - error_type: missing_policy
+      action: request_resubmission
+      message: Management policies not found. Please ensure food safety and quality policies are included and signed by top
+        management.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - HACCP Plan & Food Safety Procedures
+    - Food Safety and Quality Management System Records
+    condition: This combination verifies food safety system implementation, internal audits, and corrective actions. It includes
+      hazard controls and demonstrates operational compliance with SQF Code Modules 2.5 and 2.9.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - internal_audit_dates
+    - corrective_action_plans
+    error_recovery:
+    - error_type: missing_corrective_actions
+      action: request_update
+      message: Corrective action records are required. Please upload a complete audit and response history.
+    - error_type: scope_conflict
+      action: check_consistency
+      message: The HACCP plan and audit records refer to different scopes. Please ensure both documents reflect the same certification
+        scope.
+  - combination_required: true
+    score: 0.85
+    documents:
+    - Scope of Certification Document
+    - HACCP Plan & Food Safety Procedures
+    condition: Together, these documents define the certified scope and demonstrate the operational food safety controls applied
+      to that scope. This verifies that the organization follows appropriate food safety practices aligned with the certified
+      processes and sites.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - certification_body_name
+    error_recovery:
+    - error_type: scope_conflict
+      action: validate_scope_match
+      message: The HACCP plan must match the product/process scope mentioned in the Scope of Certification Document.
+    - error_type: missing_certification_body
+      action: request_missing_info
+      message: The certification body is not identified in one or both documents. Please ensure the body is valid and mentioned
+        in both.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Management Commitment Evidence
+    - Food Safety and Quality Management System Records
+    condition: These documents validate top-level commitment to the food safety system and demonstrate that proper recordkeeping,
+      internal audits, and corrective actions are being conducted in alignment with SQF Code requirements.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - internal_audit_dates
+    - corrective_action_plans
+    error_recovery:
+    - error_type: missing_policies
+      action: request_signed_policies
+      message: The food safety or quality policy is missing or unsigned. Please upload signed statements of management commitment.
+    - error_type: missing_audit_data
+      action: request_complete_audit_records
+      message: Audit records are incomplete or outdated. Upload full documentation of internal audits and corrective actions.
+  available_alternative_documents:
+  - title: HACCP Plan & Food Safety Procedures
+    description: A documented plan identifying food safety hazards and critical control points to ensure product safety, aligned
+      with SQF certification requirements.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.7
+    - field: certificate_scope
+      confidence: 0.7
+    - field: signatory_name
+      confidence: 0.4
+    - field: signatory_position
+      confidence: 0.4
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Scope of Certification Document
+    description: A document that clearly defines the boundaries of SQF certification, including products, processes, and sites
+      covered, aligned with SQF certification requirements.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.7
+    - field: certificate_scope
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: certificate_number
+      confidence: 0.8
+    - field: date_of_issuance
+      confidence: 0.8
+    - field: date_of_expiry
+      confidence: 1
+    - field: limitations_or_exclusions
+      confidence: 0.8
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-3 days
+  - title: Management Commitment Evidence
+    description: This document outlines the organization's leadership commitment to food safety and quality. It includes signed
+      policy statements, details of responsible personnel, and evidence of top management's role in implementing and maintaining
+      the food safety management system. The document aligns with SQF Code Module 2.1 and demonstrates ongoing management
+      reviews and resource allocation.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.9
+    - field: management_representative_name
+      confidence: 1
+    - field: management_representative_position
+      confidence: 1
+    - field: food_safety_policy
+      confidence: 1
+    - field: quality_policy
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      estimated_access_time: same-day
+  - title: Food Safety and Quality Management System Records
+    description: This document set includes essential records related to the implementation, maintenance, and verification
+      of the organization's food safety and quality management practices. It covers internal audits, corrective actions, and
+      scope verification, supporting compliance with SQF Code Modules 2.5, 2.9, and related GMP modules. These records ensure
+      the organization can demonstrate control and continuous improvement.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.9
+    - field: internal_audit_dates
+      confidence: 1
+    - field: internal_audit_scope
+      confidence: 1
+    - field: corrective_action_plans
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - audit_team
+      estimated_access_time: 1 day
+- name: BRCGS
+  key: brcgs
+  mandatory_documents:
+  - BRCGS Certificate
+  alternative_groups:
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Certification Audit Report
+    - HACCP Plan & Food Safety Procedures
+    - Scope of Certification Document
+    condition: The certification audit report must be issued by the same certification body listed on the scope document.
+      The HACCP Plan and food safety procedures must confirm alignment with the scope and demonstrate ongoing food safety
+      compliance. The scope of certification must match the actual products, sites, and processes audited and described in
+      the report.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - certification_body_name
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body is not recognized or does not match between documents. Please cross-check with the BRCGS
+        Directory or upload documents from an accredited certification body.
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match across the audit report, HACCP Plan, and scope document. Please upload
+        documents with consistent and valid scope details.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Certification Audit Report
+    - Quality Management System (QMS) Documentation
+    condition: Both the certification audit report and the Quality Management System (QMS) Documentation should be issued
+      by the same certification body, be on the same scope, issued within the same time period, and confirm that the organization
+      adheres to the applied scope of the certificate.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_version
+    - certificate_scope
+    - date_of_issuance
+    - date_of_expiry
+    - certification_body_name
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body is not recognized or does not match between documents. Please cross-check with the BRCGS
+        Directory or upload a document issued by an accredited certification body.
+    - error_type: inconsistent_date
+      action: cross_check_external_source
+      message: The issuance or expiry date is inconsistent between the Certification Audit Report and Quality Management System
+        (QMS) Documentation. Please cross-check the dates with the BRCGS Directory or upload documents with consistent dates.
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match between the Certification Audit Report and Quality Management System (QMS)
+        Documentation. Please cross-check the scope with the BRCGS Directory or upload documents with a consistent scope.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Certification Audit Report
+    - Scope of Certification Document
+    condition: Both the certification audit report and the scope of certification document should be issued by the same certification
+      body, be on the same scope, issued within the same time period, and confirm that the organization adheres to the applied
+      scope of the certificate.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_version
+    - certificate_scope
+    - date_of_issuance
+    - date_of_expiry
+    - certification_body_name
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body is not recognized or does not match between documents. Please cross-check with the BRCGS
+        Directory or upload a document issued by an accredited certification body.
+    - error_type: inconsistent_date
+      action: cross_check_external_source
+      message: The issuance or expiry date is inconsistent between the Certification Audit Report and Scope of Certification
+        Document. Please cross-check the dates with the BRCGS Directory or upload documents with consistent dates.
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match between the Certification Audit Report and Scope of Certification Document.
+        Please cross-check the scope with the BRCGS Directory or upload documents with a consistent scope.
+  available_alternative_documents:
+  - title: Certification Audit Report
+    description: A detailed report produced by the BRCGS-licensed Certification Body after conducting an audit, documenting
+      findings, observations, and conclusions including certification decisions.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: certification_body_address
+      confidence: 1
+    - field: audit_date
+      confidence: 1
+    - field: audit_type
+      confidence: 1
+    - field: scope_of_audit
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - certification_body
+      - supplier
+      estimated_access_time: 1-5 days
+  - title: HACCP Plan & Food Safety Procedures
+    description: A document that clearly defines the boundaries of certification, including products, processes, and sites
+      covered.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.7
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.4
+    - field: signatory_name
+      confidence: 0.4
+    - field: signatory_position
+      confidence: 0.4
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Scope of Certification Document
+    description: A document that clearly defines the boundaries of certification, including products, processes, and sites
+      covered, aligned with BRCGS standards.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: certificate_number
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: date_of_expiry
+      confidence: 1
+    - field: limitations_or_exclusions
+      confidence: 0.8
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-3 days
+  - title: Quality Management System (QMS) Documentation
+    description: Documents outlining the organization's quality policies, procedures, and records supporting compliance with
+      BRCGS standards.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.9
+    - field: certificate_scope
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: date_of_expiry
+      confidence: 1
+    - field: internal_audit_reports
+      confidence: 1
+    availability:
+      likelihood: rare
+      sources:
+      - certification_body
+      estimated_access_time: 3-5 days
+- name: HACCP
+  key: haccp
+  mandatory_documents:
+  - HACCP Certificate
+  alternative_groups:
+  - combination_required: true
+    score: 0.7
+    documents:
+    - HACCP Plan and Food Safety Procedures
+    - Internal Audit Report
+    - Monitoring and Verification Records
+    condition: The HACCP Plan must detail the food safety controls, the Internal Audit Report must confirm compliance, and
+      the Monitoring and Verification Records must demonstrate adherence to critical limits.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - category
+    error_recovery:
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match across documents. Please cross-check with the certification body or upload
+        documents with a consistent scope.
+  - combination_required: false
+    score: 0.9
+    documents:
+    - Audit Report from Accredited Certification Body
+    condition: The audit report must be issued by an accredited certification body, confirming compliance with HACCP standards,
+      including scope and corrective actions.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_version
+    - certificate_scope
+    - category
+    - date_of_issuance
+    - certification_body_name
+    - signatory_name
+    - signatory_position
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body is not recognized. Please upload a document issued by an accredited certification body.
+    - error_type: incomplete_address
+      action: require_full_address
+      message: The organization address is incomplete or improperly formatted. Please upload a document with the complete
+        registered address.
+  - combination_required: true
+    score: 0.6
+    documents:
+    - HACCP Plan and Food Safety Procedures
+    - Self-Declaration of Compliance
+    - Supplier Certification Records
+    condition: The HACCP Plan must outline food safety controls, the Self-Declaration must confirm compliance, and Supplier
+      Certification Records must verify ingredient safety.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - category
+    error_recovery:
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match across documents. Please cross-check with the certification body or upload
+        documents with a consistent scope.
+  available_alternative_documents:
+  - title: HACCP Plan and Food Safety Procedures
+    description: A comprehensive document detailing the organization's Hazard Analysis and Critical Control Point (HACCP)
+      system, including hazard analysis, critical control points, critical limits, monitoring procedures, corrective actions,
+      verification, and record-keeping. It should align with Codex Alimentarius HACCP principles.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.7
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.4
+    - field: signatory_name
+      confidence: 0.4
+    - field: signatory_position
+      confidence: 0.4
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Internal Audit Report
+    description: A report produced by internal personnel detailing audits of the HACCP system, including findings, corrective
+      actions, and evidence of compliance with food safety practices. It should reference the HACCP plan and demonstrate ongoing
+      compliance.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: signatory_name
+      confidence: 0.9
+    - field: signatory_position
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Audit Report from Accredited Certification Body
+    description: A detailed report from an accredited certification body evaluating the HACCP system, including audit scope,
+      methodology, findings, non-conformities, and corrective actions. It confirms compliance with HACCP standards.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: certification_body_address
+      confidence: 1
+    - field: certification_body_logo
+      confidence: 1
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: modest
+      sources:
+      - certification_body
+      estimated_access_time: 1-3 days
+  - title: Self-Declaration of Compliance
+    description: A formal statement signed by senior management asserting that the organization complies with HACCP principles
+      and food safety regulations. It should reference the HACCP plan and operational scope.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.5
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - organization
+      - supplier
+      estimated_access_time: 1 day
+  - title: Supplier Certification Records
+    description: Records documenting supplier compliance with HACCP standards for ingredients or materials, including certificates
+      of analysis and test reports. These demonstrate that critical limits are met.
+    provides_fields:
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.7
+    availability:
+      likelihood: common
+      sources:
+      - supplier
+      estimated_access_time: 2-5 days
+  - title: Monitoring and Verification Records
+    description: Records of monitoring activities (e.g., temperature logs, CCP checks) and verification procedures (e.g.,
+      lab test results) demonstrating adherence to the HACCP plan.
+    provides_fields:
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.7
+    - field: date_of_issuance
+      confidence: 0.5
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      estimated_access_time: 1-2 days
+- name: GMP
+  key: gmp
+  mandatory_documents:
+  - GMP Certificate
+  alternative_groups:
+  - combination_required: true
+    score: 0.7
+    documents:
+    - HACCP Plan and Food Safety Procedures
+    - Internal Audit Report
+    - Sanitation and Hygiene Records
+    condition: The HACCP Plan must detail food safety controls, the Internal Audit Report must confirm GMP compliance, and
+      the Sanitation and Hygiene Records must demonstrate adherence to hygiene standards.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - category
+    error_recovery:
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match across documents. Please cross-check with the certification body or upload
+        documents with a consistent scope.
+  - combination_required: false
+    score: 0.9
+    documents:
+    - Audit Report from Accredited Certification Body
+    condition: The audit report must be issued by an accredited certification body, confirming compliance with GMP standards,
+      including scope and corrective actions.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_version
+    - certificate_scope
+    - category
+    - date_of_issuance
+    - certification_body_name
+    - signatory_name
+    - signatory_position
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body is not recognized. Please upload a document issued by an accredited certification body.
+    - error_type: incomplete_address
+      action: require_full_address
+      message: The organization address is incomplete or improperly formatted. Please upload a document with the complete
+        registered address.
+  - combination_required: true
+    score: 0.6
+    documents:
+    - HACCP Plan and Food Safety Procedures
+    - Self-Declaration of Compliance
+    - Training Records
+    condition: The HACCP Plan must outline food safety controls, the Self-Declaration must confirm GMP compliance, and Training
+      Records must verify employee training on GMP standards.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - category
+    error_recovery:
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match across documents. Please cross-check with the certification body or upload
+        documents with a consistent scope.
+  available_alternative_documents:
+  - title: HACCP Plan and Food Safety Procedures
+    description: A comprehensive document detailing the organization's Hazard Analysis and Critical Control Point (HACCP)
+      system, including hazard analysis, critical control points, critical limits, monitoring procedures, corrective actions,
+      verification, and record-keeping. It serves as a prerequisite for GMP compliance.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.7
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.4
+    - field: signatory_name
+      confidence: 0.4
+    - field: signatory_position
+      confidence: 0.4
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Internal Audit Report
+    description: A report produced by internal personnel detailing audits of GMP compliance, including findings, corrective
+      actions, and evidence of adherence to hygiene and quality control practices. It should reference GMP standards and facility
+      operations.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: signatory_name
+      confidence: 0.9
+    - field: signatory_position
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Audit Report from Accredited Certification Body
+    description: A detailed report from an accredited certification body evaluating GMP compliance, including audit scope,
+      methodology, findings, non-conformities, and corrective actions. It confirms adherence to GMP standards.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: certification_body_address
+      confidence: 1
+    - field: certification_body_logo
+      confidence: 1
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: modest
+      sources:
+      - certification_body
+      estimated_access_time: 1-3 days
+  - title: Self-Declaration of Compliance
+    description: A formal statement signed by senior management asserting that the organization complies with GMP standards
+      and food safety regulations. It should reference the operational scope and hygiene practices.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.5
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - organization
+      - supplier
+      estimated_access_time: 1 day
+  - title: Sanitation and Hygiene Records
+    description: Records documenting cleaning schedules, pest control measures, and personnel hygiene practices to demonstrate
+      compliance with GMP standards.
+    provides_fields:
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.7
+    - field: date_of_issuance
+      confidence: 0.5
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      estimated_access_time: 1-2 days
+  - title: Training Records
+    description: Documentation of employee training on GMP standards, including hygiene, sanitation, and quality control procedures,
+      demonstrating compliance with personnel requirements.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.7
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      estimated_access_time: 1-2 days
+- name: WFTO
+  key: wfto
+  mandatory_documents:
+  - WFTO Certificate
+  alternative_groups:
+  - combination_required: true
+    score: 0.7
+    documents:
+    - Fair Trade Policy Document
+    - Internal Audit Report
+    - Fair Payment Records
+    condition: The Fair Trade Policy Document must outline commitment to WFTO principles, the Internal Audit Report must confirm
+      compliance, and Fair Payment Records must demonstrate fair wages to producers.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - category
+    error_recovery:
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match across documents. Please cross-check with the WFTO or upload documents
+        with a consistent scope.
+  - combination_required: false
+    score: 0.9
+    documents:
+    - Audit Report from Accredited Certification Body
+    condition: The audit report must be issued by an accredited certification body, confirming compliance with WFTO's 10 Principles,
+      including scope and corrective actions.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_version
+    - certificate_scope
+    - category
+    - date_of_issuance
+    - certification_body_name
+    - signatory_name
+    - signatory_position
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body is not recognized. Please upload a document issued by an accredited certification body.
+    - error_type: incomplete_address
+      action: require_full_address
+      message: The organization address is incomplete or improperly formatted. Please upload a document with the complete
+        registered address.
+  - combination_required: true
+    score: 0.6
+    documents:
+    - Fair Trade Policy Document
+    - Self-Declaration of Compliance
+    - Supplier Fair Trade Agreements
+    condition: The Fair Trade Policy Document must outline fair trade practices, the Self-Declaration must confirm compliance,
+      and Supplier Fair Trade Agreements must verify ethical sourcing.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - category
+    error_recovery:
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match across documents. Please cross-check with the WFTO or upload documents
+        with a consistent scope.
+  available_alternative_documents:
+  - title: Fair Trade Policy Document
+    description: A document outlining the organization's commitment to the 10 Principles of Fair Trade, including policies
+      on fair wages, safe working conditions, and environmental sustainability. It should align with WFTO standards.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.7
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.4
+    - field: signatory_name
+      confidence: 0.4
+    - field: signatory_position
+      confidence: 0.4
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Internal Audit Report
+    description: A report produced by internal personnel detailing audits of fair trade practices, including findings, corrective
+      actions, and evidence of compliance with WFTO's 10 Principles. It should reference the organization's fair trade policies.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: signatory_name
+      confidence: 0.9
+    - field: signatory_position
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Audit Report from Accredited Certification Body
+    description: A detailed report from an accredited certification body (e.g., FLOCERT, SGS) evaluating compliance with WFTO's
+      10 Principles, including audit scope, methodology, findings, and corrective actions.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: certification_body_address
+      confidence: 1
+    - field: certification_body_logo
+      confidence: 1
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: modest
+      sources:
+      - certification_body
+      estimated_access_time: 1-3 days
+  - title: Self-Declaration of Compliance
+    description: A formal statement signed by senior management asserting that the organization complies with WFTO's 10 Principles
+      of Fair Trade. It should reference the operational scope and fair trade practices.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.5
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - organization
+      - supplier
+      estimated_access_time: 1 day
+  - title: Supplier Fair Trade Agreements
+    description: Contracts or agreements with suppliers demonstrating commitment to fair trade principles, including fair
+      payment, safe working conditions, and long-term partnerships.
+    provides_fields:
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.7
+    availability:
+      likelihood: common
+      sources:
+      - supplier
+      estimated_access_time: 2-5 days
+  - title: Fair Payment Records
+    description: Records demonstrating fair payment to producers, such as wage slips, payment receipts, or living wage calculations,
+      aligned with WFTO's Fair Payment Tools.
+    provides_fields:
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.7
+    - field: date_of_issuance
+      confidence: 0.5
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+- name: IFS Food
+  key: ifs_food
+  mandatory_documents:
+  - IFS Food Certificate
+  alternative_groups:
+  - combination_required: true
+    score: 0.6
+    documents:
+    - HACCP Plan & Food Safety Procedures
+    - Internal Audit Report
+    condition: The HACCP Plan and food safety procedure records must demonstrate that the organization is actively implementing
+      and maintaining effective food safety controls. The Internal Audit Report must confirm whether the necessary IFS Food
+      requirements are being continuously met, including the consistency of certified information across all operational areas.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    error_recovery:
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The Internal Audit Report scope does not match with the details of the organization. Please upload documents
+        with a consistent scope.
+  - combination_required: false
+    score: 0.9
+    documents:
+    - Audit Report from accredited certification body
+    condition: The audit report must be issued by an IFS-recognized and accredited certification body. It should clearly indicate
+      the outcome of the audit, specify the certified products and/or processes, and confirm alignment with the organization's
+      operational scope. The document must be signed by an authorized audit representative.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_version
+    - certificate_scope
+    - date_of_issuance
+    - date_of_expiry
+    - certification_body_name
+    - signatory_name
+    - signatory_position
+    error_recovery:
+    - error_type: unlicensed_certification_body
+      action: cross_check_external_source
+      message: The certification body is not recognized. Please cross-check with the valid organizations list or upload a
+        document issued by an accredited certification body.
+    - error_type: incomplete_address
+      action: require_full_address
+      message: The organization address is incomplete or improperly formatted. Please upload a document with the complete
+        registered address.
+    - error_type: missing_organization_name
+      action: require_legal_verification
+      message: The organization name is missing or does not match registered legal records. Please upload a document showing
+        the correct legal name.
+    - error_type: missing_signature
+      action: require_signature_from_certification_body
+      message: The audit report is missing the name or position of the authorized signatory. Please provide a signed report
+        that includes full signatory details.
+  - combination_required: true
+    score: 0.6
+    documents:
+    - Audit Report from accredited certification body
+    - Self Declaration
+    condition: Both the audit report and self declaration should be refer to the same scope of the same organization.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - date_of_issuance
+    error_recovery:
+    - error_type: corrupted_file
+      action: request_reupload
+      message: One document is unreadable. Please reupload a clear copy.
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match between the Audit Report and Self Declaration. Please upload documents
+        with a consistent scope.
+  - combination_required: true
+    score: 0.4
+    documents:
+    - Internal Audit Report
+    - Self Declaration
+    condition: Both the audit report and self declaration should be refer to the same scope of the same organization.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    error_recovery:
+    - error_type: corrupted_file
+      action: request_reupload
+      message: The uploaded certificate is unreadable. Please reupload a clear copy.
+    - error_type: missing_address
+      action: request_corrected_document
+      message: The organization address is missing in one or both documents. Please upload a corrected Internal Audit Report
+        or Self Declaration that includes the complete address (street number, street name, city, state, country).
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match between the Internal Audit Report and Self Declaration. Please upload
+        documents with a consistent scope.
+    - error_type: missing_name
+      action: request_corrected_document
+      message: The organization name is missing in one or both documents. Please upload a corrected Internal Audit Report
+        or Self Declaration that includes the organization name.
+  available_alternative_documents:
+  - title: HACCP Plan & Food Safety Procedures
+    description: This document details the Hazard Analysis Critical Control Point (HACCP) system implemented by the organization
+      to ensure food safety. It should contain a thorough analysis of food safety hazards, identification of critical control
+      points, and procedures for monitoring and verification. The plan must be relevant to the scope of certification and
+      align with ISO 22000 principles. It should also outline corrective actions in case of deviations and include records
+      of food safety monitoring.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 0.7
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.4
+    - field: signatory_name
+      confidence: 0.4
+    - field: signatory_position
+      confidence: 0.4
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Internal Audit Report
+    description: An internal audit report is a document produced by the organization's internal personnel, typically those
+      with expertise in food safety and auditing.It offers a detailed account of audits conducted within the organization
+      to verify and analyze any gaps in compliance before the formal audits by certification bodies.This report should include
+      findings from the audit, an assessment of existing food safety practices, and a list of corrective actions or improvements
+      needed. The report should reference the current version of the food safety plan and demonstrate the commitment of the
+      organization to continuous improvement.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: signatory_name
+      confidence: 0.9
+    - field: signatory_position
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-2 days
+  - title: Audit Report from accredited certification body
+    description: An audit report prepared by an accredited certification body after conducting an official audit of the organization's
+      food safety management system. This report offers a detailed evaluation of the organization's compliance with the relevant
+      certification standards.It should include information on the audit scope, audit methodology,audit date,time and duration,
+      findings, non-conformities, and any corrective actions required.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: category
+      confidence: 1
+    - field: certification_body_name
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 1
+    - field: certification_body_address
+      confidence: 1
+    - field: certification_body_logo
+      confidence: 1
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: modest
+      sources:
+      - certification_body
+      estimated_access_time: 1-3 days
+  - title: Self Declaration
+    description: A self-declaration is a formal statement made by the organization asserting that it complies with the relevant
+      standards, regulations, and requirements for certification. This document is typically signed by senior management and
+      serves as a declaration verifying some information on the organization.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_version
+      confidence: 1
+    - field: certificate_scope
+      confidence: 0.7
+    - field: category
+      confidence: 0.5
+    - field: certification_body_name
+      confidence: 0.5
+    - field: date_of_issuance
+      confidence: 1
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - organization
+      - supplier
+      estimated_access_time: 1 day
+- name: GLOBALG.A.P.
+  key: globalg_a_p
+  mandatory_documents:
+  - GLOBALG.A.P. Certificate
+  - Traceability Records
+  - Records of Farm Practices
+  alternative_groups:
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Third-Party Certificates or Proof of Application
+    - Internal Audit Reports and Self-Assessment Checklists
+    - Batch Production Records, Sales Invoices, Harvest Logs
+    condition: All three documents must match on organization name, scope, and certification body. Traceability fields (GGN,
+      production site, product list) must be included in Batch Records or Logs.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - certification_body_name
+    - production_site
+    - globalgap_number
+    - product_list
+    error_recovery:
+    - error_type: incomplete_combination
+      action: request_missing_document
+      message: One or more required documents are missing or incomplete. Please upload all three substitute documents.
+    - error_type: traceability_gap
+      action: request_batch_or_log_data
+      message: Traceability info is missing from the substitute documents. Please provide GGN and production details.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Certification Application and Registration Documents
+    - Corrective Action Records
+    - Farm Diaries or Logs
+    condition: All documents must consistently show the same organization and scope. Traceability must be supported through
+      logs or corrective records.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - production_site
+    error_recovery:
+    - error_type: missing_logs
+      action: request_farm_logs
+      message: Farm activity logs are missing or incomplete. Please upload detailed records.
+    - error_type: incomplete_application
+      action: request_full_application
+      message: Registration documents are incomplete. Please provide the full application and scope declaration.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Supplier Audit Reports
+    - Batch Production Records, Sales Invoices, Harvest Logs
+    condition: Certification body and scope in audit reports must match product flow in the batch or sales records. Traceability
+      data is mandatory.
+    fields_to_match:
+    - certificate_scope
+    - certification_body_name
+    - production_site
+    - product_list
+    error_recovery:
+    - error_type: missing_supplier_audit
+      action: request_supplier_audit_report
+      message: Supplier audit report is missing or invalid. Please provide a valid version.
+    - error_type: insufficient_records
+      action: request_detailed_batch_data
+      message: Batch or product records are insufficient. Please provide more detailed traceability logs.
+  - combination_required: true
+    score: 0.6
+    documents:
+    - Audit Report from accredited certification body
+    - Self Declaration
+    condition: Both the audit report and self declaration should be refer to the same scope of the same organization.
+    fields_to_match:
+    - organization_name
+    - organization_address
+    - certificate_scope
+    - date_of_issuance
+    error_recovery:
+    - error_type: corrupted_file
+      action: request_reupload
+      message: One document is unreadable. Please reupload a clear copy.
+    - error_type: mismatched_scope
+      action: cross_check_external_source
+      message: The certificate scope does not match between the Audit Report and Self Declaration. Please cross-check the
+        scope with the FSSC Public Register or upload documents with a consistent scope.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Third-Party Certificates or Proof of Application
+    - Internal Audit Reports and Self-Assessment Checklists
+    - Batch Production Records, Sales Invoices, Harvest Logs
+    condition: Documents must match on certificate scope. Traceability fields such as production site, GGN, and product list
+      must be present in Batch Records or Harvest Logs.
+    fields_to_match:
+    - certificate_scope
+    - production_site
+    - product_list
+    - globalgap_number
+    error_recovery:
+    - error_type: incomplete_combination
+      action: request_missing_document
+      message: One or more required documents (Audit Reports, Batch Logs, or Proof of Application) are missing. Please provide
+        all documents.
+    - error_type: traceability_gap
+      action: request_batch_or_log_data
+      message: Traceability fields such as GGN, production site, or product list are missing or inconsistent across documents.
+    - error_type: unrecognized_certificate
+      action: request_official_certificate
+      message: Provided certification data is insufficient or unrecognized. Please supplement with a third-party certificate
+        or registration document.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Internal Audit Reports and Self-Assessment Checklists
+    - Batch Production Records, Sales Invoices, Harvest Logs
+    condition: Organization name and production site in audit reports must match batch and sales records. Traceability data
+      (GGN and product list) must be present in batch documentation.
+    fields_to_match:
+    - organization_name
+    - production_site
+    - product_list
+    - globalgap_number
+    error_recovery:
+    - error_type: missing_internal_audit
+      action: request_internal_audit_report
+      message: Internal audit report is missing or incomplete. Please upload a full version.
+    - error_type: traceability_gap
+      action: request_batch_or_traceability_logs
+      message: Product traceability information is missing. Please include batch records with GGN and product data.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Third-Party Certificates or Proof of Application
+    - Batch Production Records, Sales Invoices, Harvest Logs
+    condition: Organization name and certificate scope in the certificate must match the batch records. Product list and production
+      site must be traceable in batch or sales documentation.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - production_site
+    - product_list
+    error_recovery:
+    - error_type: unrecognized_certificate
+      action: request_official_proof
+      message: Third-party certificate is not valid or incomplete. Please provide a verifiable version.
+    - error_type: insufficient_records
+      action: request_additional_batch_logs
+      message: Batch records are incomplete or missing key traceability data. Please include product and production details.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Internal Audit Reports and Self-Assessment Checklists
+    - Corrective Action Records
+    - Batch Production Records, Sales Invoices, Harvest Logs
+    condition: All documents must align on organization name, production site, and traceability fields. Corrective actions
+      should relate directly to audit findings, and batch records must include product and GGN details.
+    fields_to_match:
+    - organization_name
+    - production_site
+    - globalgap_number
+    - product_list
+    - certificate_scope
+    error_recovery:
+    - error_type: incomplete_combination
+      action: request_missing_document
+      message: One or more documents required for replacing farm practice records are missing. Please upload the full set.
+    - error_type: traceability_gap
+      action: request_traceability_supporting_docs
+      message: Production site, GGN, or product list is incomplete. Provide matching details across batch and audit documents.
+    - error_type: unlinked_corrective_action
+      action: request_linked_audit_findings
+      message: Corrective action must be clearly linked to audit non-conformities. Provide documented evidence.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Farm Diaries or Logs
+    - Internal Audit Reports and Self-Assessment Checklists
+    - Batch Production Records, Sales Invoices, Harvest Logs
+    condition: Farm logs must match audit reports and batch records on organization name, production site, and product list.
+      GGN and traceability must be derived from batch or audit records.
+    fields_to_match:
+    - organization_name
+    - production_site
+    - product_list
+    - globalgap_number
+    error_recovery:
+    - error_type: missing_logs
+      action: request_farm_logs
+      message: Farm logs are missing or incomplete. Please upload farm activity records.
+    - error_type: incomplete_audit
+      action: request_complete_report
+      message: Audit report is missing or missing traceability fields. Please provide full details.
+    - error_type: traceability_gap
+      action: request_batch_or_traceability_logs
+      message: Missing GGN or product list. Please supplement with harvest records.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Corrective Action Records
+    - Internal Audit Reports and Self-Assessment Checklists
+    - Batch Production Records, Sales Invoices, Harvest Logs
+    condition: Corrective actions must align with audit findings. Batch and audit data must match on organization name, product
+      list, and traceability fields.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - production_site
+    - product_list
+    error_recovery:
+    - error_type: missing_corrective_action
+      action: request_corrective_action_report
+      message: Corrective action details are incomplete or missing. Please upload verified documentation.
+    - error_type: traceability_gap
+      action: request_batch_data
+      message: Traceability data missing in batch or audit reports. Provide detailed product and GGN info.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Farm Diaries or Logs
+    - Corrective Action Records
+    - Third-Party Certificates or Proof of Application
+    condition: Farm logs and corrective actions must be consistent with the certificate's organization and scope. Production
+      site and traceability info should be confirmed through farm logs or corrective actions.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - production_site
+    - product_list
+    error_recovery:
+    - error_type: unrecognized_certificate
+      action: request_official_certificate
+      message: Third-party certificate is incomplete or unrecognized. Please verify or provide alternate registration documents.
+    - error_type: missing_logs
+      action: request_farm_logs
+      message: Activity logs are missing or inconsistent. Provide accurate farm operation records.
+  available_alternative_documents:
+  - title: Third-Party Certificates or Proof of Application
+    description: Copies of other recognized certifications or proof that the producer has applied for GLOBALG.A.P. certification.
+      These documents support the certification status and demonstrate compliance or intent.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: organization_address
+      confidence: 0.8
+    - field: certificate_scope
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: certification_body_address
+      confidence: 0.8
+    - field: date_of_issuance
+      confidence: 0.8
+    - field: date_of_expiry
+      confidence: 0.8
+    - field: certificate_number
+      confidence: 0.9
+    - field: signatory_name
+      confidence: 0.7
+    - field: signatory_position
+      confidence: 0.7
+    availability:
+      likelihood: occasional
+      sources:
+      - supplier
+      - internal
+      estimated_access_time: 2-7 days
+  - title: Internal Audit Reports and Self-Assessment Checklists
+    description: Producer's internal audits and self-assessments used to prepare for certification audits, verifying ongoing
+      compliance and identifying improvement areas.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: organization_address
+      confidence: 0.8
+    - field: certificate_scope
+      confidence: 0.9
+    - field: production_site
+      confidence: 0.9
+    - field: audit_date
+      confidence: 0.8
+    - field: non_conformities_found
+      confidence: 0.9
+    - field: corrective_actions
+      confidence: 0.9
+    - field: auditor_name
+      confidence: 0.7
+    - field: auditor_position
+      confidence: 0.7
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      estimated_access_time: 1-3 days
+  - title: Supplier Audit Reports
+    description: Audit reports of suppliers or contractors involved in the production process that may impact certification
+      compliance.
+    provides_fields:
+    - field: supplier_name
+      confidence: 1
+    - field: supplier_address
+      confidence: 0.8
+    - field: certificate_scope
+      confidence: 0.8
+    - field: certification_body_name
+      confidence: 0.8
+    - field: date_of_issuance
+      confidence: 0.8
+    - field: date_of_expiry
+      confidence: 0.8
+    - field: audit_date
+      confidence: 0.8
+    - field: non_conformities_found
+      confidence: 0.9
+    - field: corrective_actions
+      confidence: 0.9
+    - field: auditor_name
+      confidence: 0.7
+    - field: auditor_position
+      confidence: 0.7
+    availability:
+      likelihood: occasional
+      sources:
+      - supplier
+      - internal
+      estimated_access_time: 3-7 days
+  - title: Batch Production Records, Sales Invoices, Harvest Logs
+    description: Operational records supporting production volumes, product flow, and sales to verify traceability and production
+      claims.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: production_site
+      confidence: 1
+    - field: product_list
+      confidence: 0.9
+    - field: certificate_scope
+      confidence: 0.8
+    - field: batch_number
+      confidence: 1
+    - field: harvest_date
+      confidence: 0.9
+    - field: sales_invoice_number
+      confidence: 0.9
+    - field: buyer_name
+      confidence: 0.8
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - supplier
+      estimated_access_time: 1-5 days
+  - title: Farm Diaries or Logs
+    description: Daily or periodic farm logs documenting activities, inputs, and observations relevant to GLOBALG.A.P. compliance.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.8
+    - field: production_site
+      confidence: 1
+    - field: certificate_scope
+      confidence: 0.8
+    - field: activity_date
+      confidence: 1
+    - field: activity_type
+      confidence: 0.9
+    - field: input_used
+      confidence: 0.9
+    - field: quantity_used
+      confidence: 0.8
+    - field: operator_name
+      confidence: 0.8
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      estimated_access_time: 2-7 days
+  - title: Certification Application and Registration Documents
+    description: Documents submitted by the producer to the certification body including application forms, registration confirmation,
+      and scope declarations.
+    provides_fields:
+    - field: organization_name
+      confidence: 1
+    - field: organization_address
+      confidence: 1
+    - field: certificate_scope
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 0.9
+    - field: registration_number
+      confidence: 0.9
+    - field: contact_person
+      confidence: 0.8
+    - field: contact_email
+      confidence: 0.8
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - certification_body
+      estimated_access_time: 1-3 days
+  - title: Corrective Action Records
+    description: Documentation of non-conformities identified during audits and how they were addressed, including timelines
+      and verification of effectiveness.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.8
+    - field: certificate_scope
+      confidence: 0.7
+    - field: non_conformity_id
+      confidence: 1
+    - field: description
+      confidence: 1
+    - field: corrective_action_taken
+      confidence: 1
+    - field: date_of_action
+      confidence: 0.9
+    - field: verification_date
+      confidence: 0.8
+    - field: responsible_person
+      confidence: 0.8
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - certification_body
+      estimated_access_time: 2-5 days
+- name: CanadaGAP
+  key: canadagap
+  mandatory_documents:
+  - CanadaGAP Certificate
+  - Traceability Records
+  - Records of Farm Practices
+  alternative_groups:
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Proof of application for Canada GAP certification or internal audit reports
+    - Third Party Audit Report
+    - Batch production records, sales invoices, or shipping logs that demonstrate product traceability
+    condition: All documents must consistently reference the same organization name, scope, and certification body. Traceability,
+      certificate status, and number should appear in at least one document.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - certification_body_name
+    - certificate_status
+    - certificate_number
+    error_recovery:
+    - error_type: incomplete_combination
+      action: request_missing_document
+      message: One or more required substitute documents are missing. Please upload all three alternative documents.
+    - error_type: logo_or_status_gap
+      action: request_logo_status_info
+      message: CanadaGAP logo usage or certificate status is missing in the alternative documents. Please include verification.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Internal audit reports or self-assessment checklists based on Canada GAP standards
+    - Internal food safety plans, pest control records, or water management logs
+    - Batch production records, sales invoices, or shipping logs that demonstrate product traceability
+    condition: All three documents must demonstrate alignment in scope and production site traceability. The audit and safety
+      plans must reflect the CanadaGAP standard coverage.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - certificate_status
+    error_recovery:
+    - error_type: missing_traceability
+      action: request_shipping_logs
+      message: Traceability data is incomplete. Please provide shipping logs or batch production records.
+    - error_type: noncompliant_format
+      action: request_standardized_self_assessment
+      message: Self-assessment checklist format does not match CanadaGAP standards. Please submit a standardized version.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Third Party Audit Report
+    - Internal audit reports or self-assessment checklists based on Canada GAP standards
+    - Internal food safety plans, pest control records, or water management logs
+    condition: Audit report and internal records must align on certification scope and organization details. Self-assessment
+      must reference CanadaGAP standards. Food safety logs must support program adherence.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - certification_body_name
+    - certificate_status
+    error_recovery:
+    - error_type: missing_internal_verification
+      action: request_self_assessment
+      message: The internal audit or checklist is missing. Please upload a complete and signed version.
+    - error_type: scope_mismatch
+      action: cross_check_scope_details
+      message: The audit report and internal plan show different scopes. Please confirm and resubmit.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Proof of application for Canada GAP certification or internal audit reports
+    - Internal food safety plans, pest control records, or water management logs
+    - Batch production records, sales invoices, or shipping logs that demonstrate product traceability
+    condition: Documents must reference the same organization, production site, and certificate scope. Application or audit
+      proof must reflect CanadaGAP intent; internal records must support traceability and food safety compliance.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - certificate_status
+    error_recovery:
+    - error_type: incomplete_audit_or_plan
+      action: request_internal_plan
+      message: Internal food safety or pest control documentation is missing or incomplete. Please provide complete records.
+    - error_type: traceability_gap
+      action: request_shipping_logs
+      message: Traceability information is missing in sales or shipping logs. Please upload additional data.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Proof of application for Canada GAP certification or internal audit reports
+    - Internal audit reports or self-assessment checklists based on Canada GAP standards
+    - Third Party Audit Report
+    condition: All documents must reflect the same organization and scope. The application or internal audit must demonstrate
+      CanadaGAP intent, while the third-party audit supports independent verification.
+    fields_to_match:
+    - organization_name
+    - certificate_scope
+    - certification_body_name
+    - date_of_issuance
+    error_recovery:
+    - error_type: incomplete_audit_proof
+      action: request_full_audit_report
+      message: Third-party audit report is incomplete or missing key fields. Please upload the full report with date and scope.
+    - error_type: missing_application_confirmation
+      action: request_application_proof
+      message: Proof of application is not sufficient. Please provide confirmation of submission or audit intent.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Third Party Audit Report
+    - Internal audit reports or self-assessment checklists based on Canada GAP standards
+    - Batch production records, sales invoices, or shipping logs that demonstrate product traceability
+    condition: All documents must cover a consistent certificate_scope and audit_year. Traceability information such as organization_name,
+      certificate_scope, and production tracking must be aligned across documents.
+    fields_to_match:
+    - certificate_scope
+    - audit_year
+    - organization_name
+    error_recovery:
+    - error_type: incomplete_combination
+      action: request_missing_document
+      message: 'Missing documents: Third-Party Audit, Internal Checklist, or Batch Records.'
+    - error_type: mismatch_scope
+      action: request_scope_alignment
+      message: Documents do not agree on certificate scope or audit year.
+    - error_type: invalid_audit_data
+      action: request_updated_audit_docs
+      message: Audit-related data is missing or inconsistent. Please upload updated internal or third-party audit documents.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Internal audit reports or self-assessment checklists based on Canada GAP standards
+    - Batch production records, sales invoices, or shipping logs that demonstrate product traceability
+    condition: Organization name and production site in internal audit reports must match batch or shipping records. Traceability
+      data (GGN and product list) must be present in batch documentation.
+    fields_to_match:
+    - organization_name
+    - production_site
+    - last_audit_date
+    - next_audit_date
+    error_recovery:
+    - error_type: missing_internal_audit
+      action: request_internal_audit_report
+      message: Internal audit report or self-assessment checklist is missing or incomplete. Please upload the full document.
+    - error_type: traceability_gap
+      action: request_batch_or_traceability_logs
+      message: Traceability information is incomplete or missing. Please provide batch production records or shipping logs
+        with GGN and product details.
+    - error_type: field_mismatch
+      action: validate_field_alignment
+      message: Mismatch in organization name or production site between audit and traceability records.
+  - combination_required: true
+    score: 0.85
+    documents:
+    - Proof of application for Canada GAP certification or internal audit reports
+    - Third Party Audit Report
+    condition: Certification data (certification option, certificate scope, and audit scope) from the proof of application
+      or internal audit must align with findings in the third-party audit report. Issuance and expiry dates must be consistent.
+    fields_to_match:
+    - certification_option
+    - certificate_scope
+    - audit_scope
+    - date_of_issuance
+    - date_of_expiry
+    error_recovery:
+    - error_type: missing_application_proof
+      action: request_proof_of_application
+      message: Proof of application or internal audit report is missing or insufficient.
+    - error_type: third_party_audit_missing
+      action: request_third_party_audit_report
+      message: Third-party audit report is missing or incomplete.
+    - error_type: field_inconsistency
+      action: validate_certification_data
+      message: Inconsistencies found between certification option, audit scope, or expiry dates in submitted documents.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Internal audit reports or self-assessment checklists based on Canada GAP standards
+    - Batch production records, sales invoices, or shipping logs that demonstrate product traceability
+    - Internal food safety plans, pest control records, or water management logs
+    condition: All documents must align on organization name, production site, and traceability fields as required under CanadaGAP.
+      Corrective actions must correspond to non-conformities identified in internal audits or self-assessments based on CanadaGAP
+      standards. Batch records must clearly include product  as evidence of traceability compliance.
+    fields_to_match:
+    - organization_name
+    - production_site
+    - crop_categories
+    - certification_body_name
+    error_recovery:
+    - error_type: incomplete_combination
+      action: request_missing_document
+      message: One or more documents required for replacing farm practice records are missing. Please upload the full set.
+    - error_type: traceability_gap
+      action: request_traceability_supporting_docs
+      message: Production site, or product list is incomplete. Provide matching details across batch and audit documents.
+    - error_type: unlinked_corrective_action
+      action: request_linked_audit_findings
+      message: Corrective action must be clearly linked to audit non-conformities. Provide documented evidence.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Internal audit reports or self-assessment checklists based on Canada GAP standards
+    - Proof of application for Canada GAP certification or internal audit reports
+    condition: Both documents must contain identical certification body name, certificate scope, and production site. Organization
+      details must align exactly.
+    fields_to_match:
+    - organization_name
+    - crop_categories
+    - certificate_scope
+    - certification_body_name
+    error_recovery:
+    - error_type: missing_certification_proof
+      action: request_certificate_proof
+      message: Proof of application is missing or invalid. Please provide a valid certification application document or letter.
+    - error_type: audit_mismatch
+      action: request_correct_audit_details
+      message: Mismatch in audit or scope fields. Please provide aligned audit reports with matching organization and certificate
+        scope.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Internal food safety plans, pest control records, or water management logs
+    - Internal audit reports or self-assessment checklists based on Canada GAP standards
+    - Batch production records, sales invoices, or shipping logs that demonstrate product traceability
+    condition: All three documents must match on organization name and production site. Safety plans must include water, pest,
+      and hygiene procedures. Audit must cover food safety compliance, and batch logs must include product fields.
+    fields_to_match:
+    - organization_name
+    - production_site
+    - crop_categories
+    - certificate_scope
+    error_recovery:
+    - error_type: missing_safety_logs
+      action: request_food_safety_or_water_logs
+      message: Pest, water, or hygiene logs are missing. Please upload updated logs with treatment and test records.
+    - error_type: unlinked_traceability
+      action: request_aligned_batch_data
+      message: Product traceability fields do not match across documents. Provide complete batch logs aligned with audit reports.
+    - error_type: audit_gap
+      action: request_complete_internal_audit
+      message: Internal audit is missing food safety verification. Submit full checklist with compliance records.
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Batch production records, sales invoices, or shipping logs that demonstrate product traceability
+    - Internal audit reports or self-assessment checklists based on Canada GAP standards
+    condition: Batch and shipping logs must align with internal audit reports on organization, production site, and product
+      list. Certification scope must be confirmed in audit reports.
+    fields_to_match:
+    - organization_name
+    - production_site
+    - crop_categories
+    - certificate_scope
+    error_recovery:
+    - error_type: traceability_gap
+      action: request_batch_records
+      message: Batch logs or shipping records are incomplete or missing key fields like GGN or production site.
+    - error_type: missing_scope
+      action: request_audit_scope
+      message: Audit document does not include certificate scope. Please submit a complete audit checklist with defined scope.
+  available_alternative_documents:
+  - title: Proof of application for Canada GAP certification or internal audit reports
+    description: Documents confirming that the applicant has submitted an application for CanadaGAP certification or has undergone
+      an interinal audit. This includes enrolment references, preliminary findings, and certification body assignment.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: contact_details
+      confidence: 0.9
+    - field: enrolment_form_confirmation_number
+      confidence: 0.9
+    - field: certification_option
+      confidence: 0.9
+    - field: certificate_scope
+      confidence: 0.9
+    - field: date_of_application_submission
+      confidence: 0.9
+    - field: application_status
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - applicant
+      - internal
+      estimated_access_time: 1-5 days
+  - title: Third Party Audit Report
+    description: Audit report issued by a CanadaGAP-approved certification body. Includes audit details, findings, auditor
+      credentials, and certification outcome used to determine compliance and validity under the CanadaGAP program.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: certified_operation_address
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: auditor_names_and_qualifications
+      confidence: 0.9
+    - field: last_audit_date
+      confidence: 0.9
+    - field: certification_option
+      confidence: 0.9
+    - field: audit_scope
+      confidence: 0.9
+    - field: audit_findings
+      confidence: 0.9
+    - field: audit_score_and_pass_fail_status
+      confidence: 0.9
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    - field: date_of_issuance
+      confidence: 0.9
+    - field: date_of_expiry
+      confidence: 0.9
+    availability:
+      likelihood: very_common
+      sources:
+      - supplier
+      - internal
+      estimated_access_time: 1-3 days
+  - title: Internal audit reports or self-assessment checklists based on Canada GAP standards
+    description: Completed internal audits or self-assessment checklists used by the applicant to evaluate ongoing compliance
+      with CanadaGAP requirements and identify corrective actions or risks prior to external audits.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.95
+    - field: internal_auditor_name
+      confidence: 0.9
+    - field: last_audit_date
+      confidence: 0.9
+    - field: audit_scope
+      confidence: 0.9
+    - field: corrective_actions_plan
+      confidence: 0.9
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - applicant
+      estimated_access_time: 1-2 days
+  - title: Batch production records, sales invoices, or shipping logs that demonstrate product traceability
+    description: Operational records documenting batch or lot identification, production dates and locations, sales and shipping
+      details, traceability codes, and handling conditions. These records support traceability, product flow verification,
+      and compliance with CanadaGAP requirements.
+    provides_fields:
+    - field: batch_or_lot_identification_number
+      confidence: 1
+    - field: production_date_and_location
+      confidence: 0.95
+    - field: product_description_and_quantity
+      confidence: 0.9
+    - field: harvest_or_packing_date
+      confidence: 0.9
+    - field: traceability_codes
+      confidence: 0.95
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    availability:
+      likelihood: common
+      sources:
+      - applicant
+      - internal
+      estimated_access_time: 1-3 days
+  - title: Internal food safety plans, pest control records, or water management logs
+    description: Documentation outlining the internal food safety protocols, pest control actions, water source management,
+      and related corrective actions. These records support compliance with CanadaGAP standards and ensure sanitation, traceability,
+      and responsibility tracking.
+    provides_fields:
+    - field: document_version
+      confidence: 0.9
+    - field: signatory_name
+      confidence: 1
+    - field: signatory_position
+      confidence: 1
+    - field: water_source_identification_and_testing_records
+      confidence: 0.9
+    - field: corrective_action_plan
+      confidence: 0.9
+    - field: corrective_action_closure_date
+      confidence: 0.8
+    availability:
+      likelihood: common
+      sources:
+      - internal
+      - applicant
+      estimated_access_time: 2-5 days
+- name: Certified C.L.E.A.N.
+  key: certified_c_l_e_a_n
+  mandatory_documents:
+  - Certified C.L.E.A.N. Product Certificate or Approval Letter
+  - Product Specification and Ingredient List
+  - Safety COAs and Testing Summary
+  alternative_groups: []
+  available_alternative_documents:
+  - title: C.L.E.A.N. Pre-Assessment or Enrollment Confirmation
+    description: Communication from the Certified C.L.E.A.N. program indicating that a product is under review or enrolled
+      but final certification is pending.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+- name: Certified Vegan (Vegan Action)
+  key: certified_vegan_vegan_action
+  mandatory_documents:
+  - Certified Vegan Approval or Certificate
+  - Certified Product List or Annex
+  - Signed Certification or Licensing Agreement
+  alternative_groups:
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Vegan Ingredient and Processing Declaration
+    - Full Ingredient Specification or Bill of Materials
+    - Animal Testing Policy Statement
+    condition: All three documents must align on organization name, product name, and SKU and jointly support compliance with
+      Certified Vegan criteria.
+  - combination_required: false
+    score: 0.7
+    documents:
+    - Certified Vegan Approval or Certificate
+    condition: ''
+  - combination_required: false
+    score: 0.75
+    documents:
+    - Certified Vegan Approval or Certificate
+    condition: ''
+  available_alternative_documents:
+  - title: Vegan Ingredient and Processing Declaration
+    description: Signed declaration from the supplier or brand owner confirming that the product and its processing contain
+      no animal-derived ingredients, no animal testing, and no GMOs derived from animal genes, in line with Certified Vegan
+      criteria.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+  - title: Full Ingredient Specification or Bill of Materials
+    description: Technical specification listing all ingredients, carriers, fillers, excipients, and processing aids used
+      in the product, enabling verification against vegan requirements.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+  - title: Animal Testing Policy Statement
+    description: Company- or product-level policy document stating that no animal testing is carried out on ingredients or
+      finished products and that this policy aligns with the 2009 cut-off requirement.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+- name: Certified Free From Allergens (CFF)
+  key: certified_free_from_allergens_cff
+  mandatory_documents:
+  - CFF Certified Free From Allergens Certificate
+  - CFF Audit Report or Summary
+  - Allergen Testing Reports
+  - Allergen Management and Sanitation Procedures
+  - Label Proofs with CFF Seal
+  alternative_groups:
+  - combination_required: true
+    score: 0.85
+    documents:
+    - CFF Public Listing or Brand Profile
+    - Recent CFF Audit Close-Out Letter or Email
+    condition: Both documents must refer to the same organization and certified scope.
+  available_alternative_documents:
+  - title: CFF Intent-to-Certify or Pre-Audit Letter
+    description: Communication from CFF or MenuTrinfo(R) indicating that a site or product is undergoing the CFF certification
+      process, useful where final certification is pending.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+  - title: Internal Allergen-Free Claim Validation Report
+    description: Internal validation summary of allergen management, cross-contact assessment, and testing that will underpin
+      or complement CFF Certified Free From Allergens certification.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+- name: Clean Label Project Certification
+  key: clean_label_project_certification
+  mandatory_documents:
+  - Clean Label Project Certification or Award Letter
+  alternative_groups:
+  - combination_required: true
+    score: 0.8
+    documents:
+    - Screenshot or Export from Clean Label Project Award Listing
+    - Brand Statement or Press Release Referencing CLP Award
+    condition: Both documents refer to the same product and CLP program.
+  available_alternative_documents:
+  - title: Clean Label Project Testing Summary or Transparency Project Page
+    description: Online or PDF summary of test results and CLP benchmarking for a product, especially when used with QR/lot-level
+      transparency tools.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+- name: Fairtrade International - FLOCERT Certified
+  key: fairtrade_international_flocert_certified
+  mandatory_documents:
+  - FLOCERT Fairtrade Certificate
+  alternative_groups:
+  - combination_required: true
+    score: 0.85
+    documents:
+    - FLOCERT Public Certificate Search Result
+    - Official FLOCERT Status Confirmation
+    condition: Both documents refer to the same organisation and Fairtrade product categories.
+  available_alternative_documents:
+  - title: Permission to Trade Letter
+    description: Temporary Permission to Trade letter from FLOCERT for organisations that have not yet received a full certificate.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+- name: Fair Trade Certified (Fair Trade USA)
+  key: fair_trade_certified_fair_trade_usa
+  mandatory_documents:
+  - Fair Trade USA-Related Certification Certificate
+  - Fair Trade USA Brand/Trader Partner Confirmation
+  alternative_groups:
+  - combination_required: true
+    score: 0.85
+    documents:
+    - Certification Body Public Listing or Confirmation
+    - Fair Trade USA Partner or Program Confirmation
+    condition: Both documents must reference the same certified entity and Fair Trade product categories.
+  available_alternative_documents:
+  - title: Fair Trade USA Program Enrollment or Intent Letter
+    description: Letter or email indicating that a site or brand has applied to Fair Trade USA and is working with an approved
+      certifier but final certification is pending.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+- name: Non-GMO Project Verified
+  key: non_gmo_project_verified
+  mandatory_documents:
+  - Non-GMO Project Verification Certificate or Letter
+  - Verified Product List or Annex
+  - Formulation and Ingredient Specification
+  - Testing Reports or Certificates of Analysis (COAs)
+  - Non-GMO Program Procedures and Traceability Documentation
+  - Label Proofs and Artwork Approvals
+  alternative_groups:
+  - combination_required: true
+    score: 0.85
+    documents:
+    - Non-GMO Project Verified Product Listing (Database Screenshot or Extract)
+    - Correspondence from Technical Administrator
+    condition: Both documents must refer to the same product name, brand, and organization.
+  - combination_required: false
+    score: 0.75
+    documents:
+    - Non-GMO Project Verification Certificate or Letter
+    condition: ''
+  available_alternative_documents:
+  - title: Non-GMO Product Statement (Supplier or Brand)
+    description: Signed statement from the supplier or brand owner describing non-GMO controls, key ingredients, and reference
+      to Non-GMO Project verification where the formal certificate is delayed or not yet issued.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+  - title: Internal Non-GMO Risk Assessment
+    description: Document summarizing identification of high-risk inputs, risk classification, and mitigation measures supporting
+      current or future Non-GMO Project verification.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+- name: USDA Organic
+  key: usda_organic
+  mandatory_documents:
+  - USDA Organic Certificate
+  - Transaction Certificates (for imports from non-EU countries)
+  - Processing Declarations (for multi-ingredient products)
+  - Batch/Lot Records (linked to certification)
+  alternative_groups:
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Third Party Audit Report
+    - Organic System Plan (OSP) Summary
+    - Invoices with Organic and Certifier Details
+    condition: All three documents must reference the same certified operation and product categories. At least one must contain
+      control body details and traceability information.
+    fields_to_match:
+    - organization_name
+    - Certificate_Scope
+    - certification_body_name
+    - certificate_number
+    - Product_Categories_Certified
+    error_recovery:
+    - error_type: incomplete_combination
+      action: request_missing_substitutes
+      message: One or more required substitute documents are missing or inconsistent.
+    - error_type: traceability_gap
+      action: validate_traceability_path
+      message: Traceability information is missing across substitute documents.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Third Party Audit Report
+    - Organic System Plan (OSP) Summary
+    - Invoices with Organic and Certifier Details
+    condition: All three documents must reference the same certified operation and product categories. At least one must contain
+      control body details and traceability information.
+    fields_to_match:
+    - organization_name
+    - Certificate_Scope
+    - certification_body_name
+    - certificate_number
+    - Product_Categories_Certified
+    error_recovery:
+    - error_type: incomplete_combination
+      action: request_missing_substitutes
+      message: One or more required substitute documents are missing or inconsistent.
+    - error_type: traceability_gap
+      action: validate_traceability_path
+      message: Traceability information is missing across substitute documents.
+  - combination_required: true
+    score: 0.85
+    documents:
+    - Supplier's Declaration of Compliance
+    - Transaction Certificates (TCs)
+    - Shipping or Packing Slips with Certifier Info
+    condition: All three documents must consistently reference the same organization, product categories, and certification
+      status, providing a traceable chain from compliance declaration through transaction and shipment.
+    fields_to_match:
+    - organization_name
+    - Product_Categories_Certified
+    - Certification_Status
+    - certification_body_name
+    error_recovery:
+    - error_type: missing_transaction_or_shipment
+      action: request_transaction_and_shipment_docs
+      message: Transaction or shipment documents are missing or incomplete. Please upload both to verify traceability.
+    - error_type: inconsistent_certification_status
+      action: validate_certification_status
+      message: Certification status mismatch between declaration and transaction or shipment documents.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Previous Organic Certificate
+    - NOP Import Certificate (Form NOP 2110)
+    - Letter of Good Standing
+    condition: All three documents must align on organization, certificate number, certification body, and product scope,
+      confirming valid and active certification across import and standing status.
+    fields_to_match:
+    - organization_name
+    - certificate_number
+    - certification_body_name
+    - Certificate_Scope
+    - Certification_Status
+    error_recovery:
+    - error_type: expired_or_inactive_certificate
+      action: request_updated_certificate
+      message: One or more certificates are expired or not active. Please provide updated documents.
+    - error_type: mismatched_certificate_numbers
+      action: validate_certificate_numbers
+      message: Certificate numbers do not match across documents. Please confirm accuracy.
+  - combination_required: true
+    score: 0.95
+    documents:
+    - Organic System Plan (OSP) Summary
+    - Third-Party Audit Reports
+    - Invoices with Organic and Certifier Details
+    condition: These documents must consistently reference the same operation, certification body, and product categories.
+      Audit reports must validate the OSP, and traceability documents must confirm product movement.
+    fields_to_match:
+    - organization_name
+    - certification_body_name
+    - Certificate_Scope
+    - Product_Categories_Certified
+    error_recovery:
+    - error_type: missing_audit_or_traceability
+      action: request_audit_and_traceability_docs
+      message: Audit report or traceability documentation is missing or incomplete.
+    - error_type: inconsistent_scope_or_products
+      action: validate_document_scope
+      message: Scope or product categories are inconsistent across documents.
+  - combination_required: true
+    score: 0.88
+    documents:
+    - Third Party Audit Report
+    - Shipping or Packing Slips with Certifier Info
+    - Invoices with Organic and Certifier Details
+    condition: All documents must reference the same shipment and product certification. Shipment origin and product scope
+      must be consistent.
+    fields_to_match:
+    - organization_name
+    - Product_Categories_Certified
+    - certificate_number
+    - Certification_Status
+    error_recovery:
+    - error_type: shipment_inconsistency
+      action: request_correct_shipment_data
+      message: Mismatch in shipment origin or destination.
+    - error_type: missing_certification_scope
+      action: request_scope_alignment
+      message: Certificate scope is not clearly reflected across all documents.
+  - combination_required: true
+    score: 0.9
+    documents:
+    - Third-Party Audit Reports
+    - hipping or Packing Slips with Certifier Info
+    - Invoices with Organic and Certifier Details
+    condition: All documents must reference the same shipment, certified product categories, and certifier. The scope and
+      certification status must align. Shipment origin and batch traceability details must be consistently presented across
+      all documents.
+    fields_to_match:
+    - organization_name
+    - Product_Categories_Certified
+    - certification_body_name
+    - certificate_number
+    - date_of_issuance
+    - Certification_Status
+    - Shipment_details
+    error_recovery:
+    - error_type: shipment_inconsistency
+      action: request_correct_shipment_data
+      message: Mismatch in shipment origin or destination.
+    - error_type: missing_certification_scope
+      action: request_scope_alignment
+      message: Certificate scope is not clearly reflected across all documents.
+    - error_type: traceability_gap
+      action: request_batch_or_traceability_logs
+      message: Missing batch numbers or traceable shipment data.
+    - error_type: certifier_info_mismatch
+      action: verify_certifying_body_alignment
+      message: Certifier information is inconsistent across supporting documents.
+  - combination_required: true
+    score: 0.87
+    documents:
+    - Organic System Plan (OSP) Summary
+    - Previous USDA Organic Certificate
+    condition: OSP summary and certificate must share the same certification body, organization name, and Certificate_Scope.
+      Certification_Status must indicate compliance in both.
+    fields_to_match:
+    - organization_name
+    - certification_body_name
+    - Certificate_Scope
+    - Certification_Status
+    error_recovery:
+    - error_type: certifier_info_mismatch
+      action: verify_certifier_alignment
+      message: Certifier does not match across documents.
+    - error_type: invalid_scope_or_status
+      action: validate_scope_and_status
+      message: Mismatch in certificate scope or status.
+  - combination_required: true
+    score: 0.88
+    documents:
+    - Transaction Certificates
+    - Invoices with Organic and Certifier Details
+    condition: Transaction Certificate and Invoice must match on product categories, certificate number, and certifier. Both
+      must confirm shipment and certification validity.
+    fields_to_match:
+    - certificate_number
+    - certification_body_name
+    - Product_Categories_Certified
+    - Certification_Status
+    error_recovery:
+    - error_type: shipment_certifier_mismatch
+      action: reconcile_certifier_details
+      message: Certification body mismatch across invoice and transaction certificate.
+    - error_type: expired_certificate
+      action: request_valid_certificate
+      message: Certificate may be expired or status inactive.
+  - combination_required: true
+    score: 0.84
+    documents:
+    - Invoices with Organic and Certifier Details
+    - Organic System Plan (OSP) Summary
+    condition: Organization name, Product Categories, and Certification_Status must align across OSP and invoices. Certifier
+      must be USDA-accredited and consistent.
+    fields_to_match:
+    - organization_name
+    - certification_body_name
+    - Product_Categories_Certified
+    - Certification_Status
+    error_recovery:
+    - error_type: incomplete_osp
+      action: request_full_osp_summary
+      message: OSP summary is missing required product or certification details.
+    - error_type: invoice_certifier_gap
+      action: validate_invoice_certification_info
+      message: Invoice missing certification body or organic product reference.
+  - combination_required: true
+    score: 0.89
+    documents:
+    - Organic System Plan (OSP) Summary
+    - Invoices with Organic and Certifier Details
+    condition: All documents must align on processor name, certification body, certified product categories, and include a
+      processing scope or facility reference. OSP must include scope of activities, while invoice must confirm certified ingredients.
+      Compliance must be inferred from OSP and traceability logs.
+    fields_to_match:
+    - organization_name
+    - certification_body_name
+    - Product_Categories_Certified
+    - Certificate_Scope
+    - OSP_Reference
+    error_recovery:
+    - error_type: scope_or_ingredients_gap
+      action: request_complete_scope_docs
+      message: Missing certified ingredients or processing scope.
+    - error_type: missing_compliance_phrase
+      action: annotate_compliance_statement
+      message: No clear declaration of compliance found in OSP or invoice.
+  - combination_required: true
+    score: 0.85
+    documents:
+    - Transaction Certificates (TCs)
+    - Third-Party Audit Reports
+    condition: Processor name, product category, and certification details must be identical. Audit must confirm USDA organic
+      processing standards were met. Transaction certificate must reflect certified ingredients and certifier.
+    fields_to_match:
+    - organization_name
+    - certification_body_name
+    - Product_Categories_Certified
+    - Certification_Status
+    error_recovery:
+    - error_type: incomplete_transaction_details
+      action: request_certified_product_info
+      message: Certified product or ingredient detail missing in transaction record.
+    - error_type: audit_scope_gap
+      action: confirm_processing_scope_in_audit
+      message: Audit does not clearly mention processing compliance.
+  - combination_required: true
+    score: 0.87
+    documents:
+    - Shipping or Packing Slips with Certifier Info
+    - Organic System Plan (OSP) Summary
+    - Invoices with Organic and Certifier Details
+    condition: All documents must align on processor name, certification body, certified product categories, and include traceability
+      and operation location. OSP must include operational scope. Invoice and packing slip must confirm certified products
+      and shipment trace.
+    fields_to_match:
+    - organization_name
+    - certification_body_name
+    - certificate_number
+    - Product_Categories_Certified
+    - Operation_Location
+    error_recovery:
+    - error_type: missing_location_or_batch
+      action: attach_traceable_log
+      message: No traceable link to production or operation location.
+  - combination_required: true
+    score: 0.84
+    documents:
+    - Transaction Certificates (TCs)
+    - Third-Party Audit Reports
+    condition: Transaction certificate must confirm product identity and certifier. Audit report must verify operation location
+      and scope. Both must agree on certification status and traceable batch-level data.
+    fields_to_match:
+    - organization_name
+    - certification_body_name
+    - certificate_number
+    - Product_Categories_Certified
+    - Certification_Status
+    error_recovery:
+    - error_type: audit_scope_gap
+      action: request_processing_scope
+      message: Audit does not clearly specify certified operation or batch trace.
+  - combination_required: true
+    score: 0.83
+    documents:
+    - Supplier's Declaration of Compliance
+    - Previous USDA Organic Certificate
+    condition: Supplier declaration must list certificate number and status. Previous certificate must confirm certification
+      body, categories, and operation location. Combined, these ensure valid certification linkage and traceability.
+    fields_to_match:
+    - organization_name
+    - certificate_number
+    - Product_Categories_Certified
+    - Certification_Status
+    - certification_body_name
+    error_recovery:
+    - error_type: missing_certificate_scope
+      action: retrieve_historic_scope
+      message: Previous certificate does not contain full certification scope.
+  available_alternative_documents:
+  - title: Supplier's Declaration of Compliance for USDA Organic Certification
+    description: A signed legal statement from the supplier confirming that their products and practices continue to comply
+      with USDA organic standards. This declaration is typically provided when the certificate is under renewal or temporarily
+      unavailable.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: product_categories_certified
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: certificate_number
+      confidence: 0.9
+    - field: date_of_issuance
+      confidence: 0.9
+    - field: Certification_Status
+      confidence: 0.9
+    - field: authorized_signature
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - supplier
+      - internal
+      estimated_access_time: 1-3 days
+  - title: Third-Party Audit Reports for USDA Organic Certification
+    description: Inspection and audit reports issued by USDA-accredited certifying agents, documenting the findings from scheduled
+      or unannounced audits. These reports help confirm ongoing compliance with USDA organic standards and are often required
+      during certificate renewal or compliance investigations.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: certificate_number
+      confidence: 0.9
+    - field: date_of_issuance
+      confidence: 0.9
+    - field: Certification_Status
+      confidence: 0.9
+    - field: Certificate_Scope
+      confidence: 0.9
+    - field: Operation_Location
+      confidence: 0.9
+    - field: audit_findings
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - certification_body
+      - audit_team
+      estimated_access_time: 1-7 days
+  - title: Previous USDA Organic Certificate
+    description: A copy of a past USDA Organic certificate showing certification details, validity period, scope, operation
+      location, and certified product categories. This document is used during renewal periods or when the current certificate
+      is pending issuance.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: certificate_number
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: date_of_issuance
+      confidence: 0.9
+    - field: date_of_expiry
+      confidence: 0.9
+    - field: Certificate_Scope
+      confidence: 0.9
+    - field: Operation_Location
+      confidence: 0.9
+    - field: Certification_Status
+      confidence: 0.9
+    - field: Product_Categories_Certified
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - applicant
+      - certification_body
+      estimated_access_time: 1-5 days
+  - title: NOP Import Certificate (Form NOP 2110)
+    description: Official USDA Organic import certificate (Form NOP 2110) issued by a USDA-accredited certifying agent, verifying
+      that imported products comply with USDA organic standards. Required for organic imports entering the U.S. under trade
+      arrangements.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: certificate_number
+      confidence: 0.9
+    - field: date_of_issuance
+      confidence: 0.9
+    - field: date_of_expiry
+      confidence: 0.9
+    - field: Product_Categories_Certified
+      confidence: 0.9
+    - field: Certification_Status
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - certification_body
+      - importer
+      estimated_access_time: 1-3 days
+  - title: Organic System Plan (OSP) Summary
+    description: A summary of the approved Organic System Plan (OSP), outlining the scope of organic operations, certified
+      product categories, and compliance status. This plan is required by the USDA National Organic Program and must be approved
+      and maintained by a USDA-accredited certifying agent.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: OSP_Reference
+      confidence: 0.9
+    - field: Certificate_Scope
+      confidence: 0.9
+    - field: Product_Categories_Certified
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: Certification_Status
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - certification_body
+      - applicant
+      estimated_access_time: 1-7 days
+  - title: Letter of Good Standing from USDA-Accredited Certifier
+    description: A formal letter issued by a USDA-accredited certifier confirming that the operation is in good standing with
+      the National Organic Program. This letter typically includes certification status, certificate scope, and is used for
+      verification during trade, renewals, or export documentation.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: certificate_number
+      confidence: 0.9
+    - field: date_of_issuance
+      confidence: 0.9
+    - field: Certification_Status
+      confidence: 0.9
+    - field: Certificate_Scope
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - certification_body
+      estimated_access_time: 1-3 days
+  - title: Transaction Certificates (TCs)
+    description: Certificates issued by USDA-accredited certifiers that confirm specific transactions of organic goods between
+      certified entities. These documents ensure the traceability and certified status of organic products during sales.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: certificate_number
+      confidence: 0.9
+    - field: date_of_issuance
+      confidence: 0.9
+    - field: Product_Categories_Certified
+      confidence: 0.9
+    - field: Certification_Status
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - certification_body
+      - seller
+      - buyer
+      estimated_access_time: 1-3 days
+  - title: Shipping or Packing Slips with Certifier Information
+    description: Shipping or packing documents that include certifier details, product descriptions, and shipment dates. Used
+      to track organic product movements and confirm alignment with certified operations.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: certificate_number
+      confidence: 0.8
+    - field: Product_Categories_Certified
+      confidence: 0.9
+    - field: Operation_Location
+      confidence: 0.9
+    - field: date_of_issuance
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - shipper
+      - certifier
+      estimated_access_time: Immediate
+  - title: Invoices with Organic and Certifier Details
+    description: Commercial invoices that document organic product sales and include certification body references. Used to
+      confirm certified organic status of products sold between certified operations.
+    provides_fields:
+    - field: organization_name
+      confidence: 0.9
+    - field: certification_body_name
+      confidence: 0.9
+    - field: certificate_number
+      confidence: 0.8
+    - field: Product_Categories_Certified
+      confidence: 0.9
+    - field: date_of_issuance
+      confidence: 0.9
+    availability:
+      likelihood: common
+      sources:
+      - seller
+      - buyer
+      estimated_access_time: Immediate
+- name: Certified Gluten-Free (GFCO)
+  key: certified_gluten_free_gfco
+  mandatory_documents:
+  - GFCO Certificate & Product Schedule
+  alternative_groups:
+  - combination_required: true
+    score: 0.7
+    documents:
+    - Certificate of Analysis (COA) for Gluten Testing
+    - Manufacturer's Gluten-Free Declaration
+    condition: Can verify a generic 'Gluten-Free' claim, but CANNOT verify a specific 'GFCO Certified' logo claim. For GFCO,
+      the certificate is mandatory.
+  available_alternative_documents:
+  - title: Certificate of Analysis (COA) - Gluten Content
+    description: Lab report showing the batch/lot tested at < 10 ppm gluten. Useful for verifying generic claims if GFCO cert
+      is pending.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+  - title: Letter of Good Standing from GFCO
+    description: Official letter from GFCO confirming the brand/facility is currently in good standing while waiting for a
+      renewed certificate document.
+    provides_fields: []
+    availability:
+      likelihood: ''
+      sources: []
+      estimated_access_time: ''
+
+

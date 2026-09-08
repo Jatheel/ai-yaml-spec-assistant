@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI YAML Specification Assistant</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      box-shadow: 0 0 40px rgba(0,0,0,0.08);
+    }
+
+    /* Header */
+    .header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      background: #1a1a2e;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .header-text h1 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .header-text p {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      margin-left: auto;
+    }
+
+    /* Badge selector */
+    .badge-bar {
+      padding: 10px 24px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow-x: auto;
+    }
+
+    .badge-bar span {
+      font-size: 12px;
+      color: #888;
+      white-space: nowrap;
+    }
+
+    .badge-chip {
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      font-size: 12px;
+      color: #444;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .badge-chip:hover {
+      background: #1a1a2e;
+      color: #fff;
+      border-color: #1a1a2e;
+    }
+
+    /* Messages */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .message {
+      display: flex;
+      gap: 10px;
+      max-width: 85%;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message.agent {
+      align-self: flex-start;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .message.user .avatar {
+      background: #1a1a2e;
+      color: #fff;
+    }
+
+    .message.agent .avatar {
+      background: #f0f0f0;
+      color: #555;
+    }
+
+    .bubble {
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #1a1a1a;
+    }
+
+    .message.user .bubble {
+      background: #1a1a2e;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.agent .bubble {
+      background: #f7f7f7;
+      border-bottom-left-radius: 4px;
+      white-space: pre-wrap;
+    }
+
+    /* Typing indicator */
+    .typing .bubble {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 14px 16px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      background: #aaa;
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-6px); }
+    }
+
+    /* Input */
+    .input-area {
+      padding: 16px 24px;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .input-area textarea {
+      flex: 1;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      line-height: 1.5;
+      max-height: 120px;
+      transition: border 0.15s;
+    }
+
+    .input-area textarea:focus {
+      border-color: #1a1a2e;
+    }
+
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #1a1a2e;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity 0.15s;
+    }
+
+    .send-btn:hover { opacity: 0.85; }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .send-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-logo">A</div>
+    <div class="header-text">
+      <h1>AI YAML Specification Assistant</h1>
+      <p>Alternative document guidance</p>
+    </div>
+    <div class="status-dot"></div>
+  </div>
+
+  <!-- Badge quick select -->
+  <div class="badge-bar">
+    <span>Quick select:</span>
+  </div>
+
+  <!-- Messages -->
+  <div class="messages" id="messages">
+    <div class="message agent">
+      <div class="avatar">A</div>
+      <div class="bubble">Hi! I can help you find alternative documents when a supplier is missing a certification. 
+
+Select a badge above or describe your situation — for example: "The supplier doesn't have an FSSC 22000 certificate."</div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-area">
+    <textarea id="input" placeholder="Describe the missing certificate..." rows="1"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message" title="Send message">
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  const API = 'http://127.0.0.1:8000';
+  const REQUEST_TIMEOUT_MS = 45000;
+  const MAX_HISTORY_ITEMS = 24;
+  const MAX_HISTORY_CONTENT_CHARS = 2000;
+  let history = [];
+
+  function compactHistory(items) {
+    return items.slice(-MAX_HISTORY_ITEMS).map(msg => ({
+      role: msg.role,
+      content: String(msg.content || '').slice(0, MAX_HISTORY_CONTENT_CHARS)
+    }));
+  }
+
+  // Load badges into the bar
+  async function loadBadges() {
+    try {
+      const res = await fetch(`${API}/badges`);
+      const data = await res.json();
+      const bar = document.querySelector('.badge-bar');
+      data.badges.forEach(name => {
+        const chip = document.createElement('button');
+        chip.className = 'badge-chip';
+        chip.textContent = name;
+        chip.onclick = () => {
+          document.getElementById('input').value =
+            `The supplier doesn't have a ${name} certificate`;
+          sendMessage();
+        };
+        bar.appendChild(chip);
+      });
+    } catch (e) {
+      console.error('Could not load badges', e);
+    }
+  }
+
+  function addMessage(role, text) {
+    const messages = document.getElementById('messages');
+
+    const wrap = document.createElement('div');
+    wrap.className = `message ${role}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = role === 'user' ? 'U' : 'A';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+
+    wrap.appendChild(avatar);
+    wrap.appendChild(bubble);
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+
+    return wrap;
+  }
+
+  function addTyping() {
+    const messages = document.getElementById('messages');
+    const wrap = document.createElement('div');
+    wrap.className = 'message agent typing';
+    wrap.id = 'typing';
+    wrap.innerHTML = `
+      <div class="avatar">A</div>
+      <div class="bubble">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>`;
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typing');
+    if (el) el.remove();
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('input');
+    const btn = document.getElementById('sendBtn');
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    btn.disabled = true;
+
+    addMessage('user', text);
+    addTyping();
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+      const res = await fetch(`${API}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: compactHistory(history) }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        let detail = '';
+        try {
+          const errorBody = await res.json();
+          detail = errorBody.detail ? String(errorBody.detail) : '';
+        } catch (_) {
+          // Ignore parse errors and use fallback below.
+        }
+        throw new Error(detail || `Server returned ${res.status}`);
+      }
+
+      const data = await res.json();
+      removeTyping();
+
+      const agentMsg = data.response;
+      addMessage('agent', agentMsg);
+
+      // Update history
+      history.push({ role: 'user', content: text });
+      history.push({ role: 'assistant', content: agentMsg });
+
+    } catch (e) {
+      removeTyping();
+      if (e.name === 'AbortError') {
+        addMessage('agent', 'The request timed out. Please try again or ask a shorter follow-up.');
+      } else {
+        addMessage('agent', `Sorry, could not complete the request: ${e.message}`);
+      }
+      console.error('Chat error:', e);
+    }
+
+    btn.disabled = false;
+    input.focus();
+  }
+
+  // Send on Enter (Shift+Enter for new line)
+  document.getElementById('input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Auto-resize textarea
+  document.getElementById('input').addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+  });
+
+  loadBadges();
+</script>
+
+</body>
+</html>
