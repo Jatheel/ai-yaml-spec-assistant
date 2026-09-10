@@ -59,7 +59,7 @@ llm = ChatGroq(
     temperature=settings.llm_temperature,
 )
 model_with_tools = llm.bind_tools(tools)
-model_with_structured_output = llm.with_structured_output(AgentDocResponse)
+model_with_structured_output = llm.with_structured_output(AgentDocResponse, method="json_mode")
 
 SYSTEM_PROMPT = (
     "You are a production-grade documentation intelligence agent.\n\n"
@@ -268,7 +268,8 @@ def synthesize_output(state: AgentState) -> dict:
     formatting_instruction = (
         "You are a response formatter for a documentation intelligence system.\n"
         "Do NOT call any tools. Do NOT fabricate data.\n"
-        "Use ONLY the retrieved documentation below to populate the response.\n\n"
+        "Use ONLY the retrieved documentation below to populate the response.\n"
+        "Return the result as a valid JSON object.\n\n"
         f"USER QUERY: {user_query}\n\n"
         f"--- RETRIEVED DOCUMENTATION ---\n{grounded_context}\n\n"
         "Instructions:\n"

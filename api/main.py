@@ -307,3 +307,9 @@ async def stream_agent(request: QueryRequest):
             yield _sse_event({"event": "error", "message": str(err)})
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+@app.post("/api/v1/ingest/ide/event")
+@app.post("/api/v1/ingest/browser/event")
+def silence_telemetry():
+    """Dummy endpoints to swallow background IDE/browser telemetry and prevent 404 logs."""
+    return {"status": "ok"}
