@@ -1,0 +1,18 @@
+# Git
+.git
+.gitignore
+
+# Virtual Environment
+venv/
+env/
+
+# Environment Variables (Security!)
+.env
+
+# Python Caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Local Database/Vector Store
+data/chroma_db/
