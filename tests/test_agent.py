@@ -1,4 +1,3 @@
-import pytest
 from agent.agent import _compute_grounded_confidence
 
 def test_compute_grounded_confidence():

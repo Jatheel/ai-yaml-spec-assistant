@@ -1,4 +1,3 @@
-import pytest
 from tools.alternative_docs_tool import _normalize_key, _clean_text_list
 
 def test_normalize_key():
