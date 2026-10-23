@@ -1,3 +1,7 @@
+import os
+
+os.environ.setdefault("GROQ_API_KEY", "test-key")
+
 from agent.agent import _compute_grounded_confidence
 
 def test_compute_grounded_confidence():
