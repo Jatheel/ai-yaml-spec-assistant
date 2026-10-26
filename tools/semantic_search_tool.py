@@ -1,7 +1,9 @@
 """Dense semantic vector search tool with relevance score passthrough."""
 
 import logging
+
 from langchain_core.tools import tool
+
 from tools.vector_store import build_or_get_vectorstore
 
 logger = logging.getLogger("doc-agent.tools.semantic")
@@ -40,6 +42,6 @@ def semantic_docs_search(query: str) -> str:
         logger.info(f"Semantic search returned {len(results)} results for: {query[:60]}")
         return "\n\n---\n\n".join(formatted)
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — tools return error strings, never raise
         logger.error(f"Semantic search failed: {e}")
-        return f"Error during semantic search: {str(e)}"
+        return f"Error during semantic search: {e!s}"

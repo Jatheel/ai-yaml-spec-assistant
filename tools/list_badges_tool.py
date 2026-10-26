@@ -1,7 +1,9 @@
 """Tool to list all available certification badges in the specification database."""
 
 import logging
+
 from langchain_core.tools import tool
+
 from tools.alternative_docs_tool import _load_yaml, _normalize_key
 
 logger = logging.getLogger("doc-agent.tools.badges")
@@ -40,6 +42,6 @@ def list_available_badges() -> str:
         logger.info(f"Listed {len(badges)} badges")
         return "\n".join(lines)
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — tools return error strings, never raise
         logger.error(f"Badge listing failed: {e}")
-        return f"Error listing badges: {str(e)}"
+        return f"Error listing badges: {e!s}"

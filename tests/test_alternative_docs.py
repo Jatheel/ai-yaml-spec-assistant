@@ -1,5 +1,5 @@
-import pytest
-from tools.alternative_docs_tool import _normalize_key, _clean_text_list
+from tools.alternative_docs_tool import _clean_text_list, _normalize_key
+
 
 def test_normalize_key():
     assert _normalize_key("FSSC 22000") == "fssc_22000"

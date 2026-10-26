@@ -7,9 +7,10 @@ Features:
 - Conversation memory via MemorySaver checkpointer
 """
 
-import re
 import logging
-from typing import Annotated, Sequence, TypedDict
+import re
+from collections.abc import Sequence
+from typing import Annotated, TypedDict
 
 from langchain_core.messages import (
     BaseMessage,
@@ -18,16 +19,16 @@ from langchain_core.messages import (
     ToolMessage,
 )
 from langchain_groq import ChatGroq
-from langgraph.graph import StateGraph, END
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import END, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
-from langgraph.checkpoint.memory import MemorySaver
 
+from agent.schemas import AgentDocResponse, RetrievalSource
 from config import settings
 from tools.alternative_docs_tool import get_alternative_docs
-from tools.semantic_search_tool import semantic_docs_search
 from tools.list_badges_tool import list_available_badges
-from agent.schemas import AgentDocResponse, RetrievalSource
+from tools.semantic_search_tool import semantic_docs_search
 
 logger = logging.getLogger("doc-agent.agent")
 
@@ -47,19 +48,37 @@ class AgentState(TypedDict):
 
 
 # ---------------------------------------------------------------------------
-# 2. Initialize Tools & LLM
+# 2. Tools list (pure, no network I/O at import time)
 # ---------------------------------------------------------------------------
 
 tools = [get_alternative_docs, semantic_docs_search, list_available_badges]
-tool_node = ToolNode(tools)
 
-llm = ChatGroq(
-    model=settings.groq_model,
-    groq_api_key=settings.groq_api_key,
-    temperature=settings.llm_temperature,
-)
-model_with_tools = llm.bind_tools(tools)
-model_with_structured_output = llm.with_structured_output(AgentDocResponse, method="json_mode")
+# ---------------------------------------------------------------------------
+# 2a. Lazy singletons — LLM and graph are built on first invocation only.
+#     This keeps test collection fast and avoids API key requirements at import.
+# ---------------------------------------------------------------------------
+
+_tool_node: ToolNode | None = None
+_model_with_tools = None
+_model_with_structured_output = None
+_doc_agent = None
+
+
+def _get_components():
+    """Build (or return cached) LLM, tool node, and structured-output model."""
+    global _tool_node, _model_with_tools, _model_with_structured_output
+    if _model_with_tools is None:
+        _tool_node = ToolNode(tools)
+        llm = ChatGroq(
+            model=settings.groq_model,
+            groq_api_key=settings.groq_api_key,
+            temperature=settings.llm_temperature,
+        )
+        _model_with_tools = llm.bind_tools(tools)
+        _model_with_structured_output = llm.with_structured_output(
+            AgentDocResponse, method="json_mode"
+        )
+    return _tool_node, _model_with_tools, _model_with_structured_output
 
 SYSTEM_PROMPT = (
     "You are a production-grade documentation intelligence agent.\n\n"
@@ -86,6 +105,7 @@ SYSTEM_PROMPT = (
 
 def call_model(state: AgentState) -> dict:
     """Processes message history and determines if tool invocation is necessary."""
+    _, model_with_tools, _ = _get_components()
     messages = list(state["messages"])
 
     # Inject system prompt if not already present
@@ -282,6 +302,7 @@ def synthesize_output(state: AgentState) -> dict:
     )
 
     try:
+        _, _, model_with_structured_output = _get_components()
         structured_res = model_with_structured_output.invoke(
             [HumanMessage(content=formatting_instruction)]
         )
@@ -297,12 +318,12 @@ def synthesize_output(state: AgentState) -> dict:
             f"sources={len(sources)}, badges={all_badges}"
         )
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — synthesis fallback must never crash the API
         logger.error(f"Structured output synthesis failed: {e}")
         # Fallback: return a valid response even if structured output fails
         structured_res = AgentDocResponse(
             direct_answer=(
-                f"I retrieved documentation but encountered a formatting error: {str(e)}\n\n"
+                f"I retrieved documentation but encountered a formatting error: {e!s}\n\n"
                 f"Raw retrieval data:\n{grounded_context[:500]}"
             ),
             confidence_score=confidence,
@@ -315,31 +336,44 @@ def synthesize_output(state: AgentState) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# 6. Assemble the StateGraph
+# 6. Lazy StateGraph assembly
 # ---------------------------------------------------------------------------
 
-workflow = StateGraph(AgentState)
+def _get_agent():
+    """Build (or return cached) compiled LangGraph doc_agent."""
+    global _doc_agent
+    if _doc_agent is None:
+        tool_node, _, _ = _get_components()
+        workflow = StateGraph(AgentState)
+        workflow.add_node("agent", call_model)
+        workflow.add_node("tools", tool_node)
+        workflow.add_node("synthesize", synthesize_output)
+        workflow.set_entry_point("agent")
+        workflow.add_conditional_edges(
+            "agent",
+            should_continue,
+            {"tools": "tools", "synthesize": "synthesize"},
+        )
+        workflow.add_edge("tools", "agent")
+        workflow.add_edge("synthesize", END)
+        memory = MemorySaver()
+        _doc_agent = workflow.compile(checkpointer=memory)
+        logger.info("LangGraph doc_agent compiled and ready")
+    return _doc_agent
 
-workflow.add_node("agent", call_model)
-workflow.add_node("tools", tool_node)
-workflow.add_node("synthesize", synthesize_output)
 
-workflow.set_entry_point("agent")
+# Expose module-level alias used by api/main.py (resolved lazily on first access)
+class _LazyAgent:
+    """Thin proxy so `doc_agent.astream(...)` resolves at call time, not import time."""
+    def invoke(self, *args, **kwargs):
+        return _get_agent().invoke(*args, **kwargs)
 
-workflow.add_conditional_edges(
-    "agent",
-    should_continue,
-    {
-        "tools": "tools",
-        "synthesize": "synthesize",
-    },
-)
-workflow.add_edge("tools", "agent")
-workflow.add_edge("synthesize", END)
+    async def astream(self, *args, **kwargs):
+        async for chunk in _get_agent().astream(*args, **kwargs):
+            yield chunk
 
-# Compile with MemorySaver for conversation persistence across queries
-memory = MemorySaver()
-doc_agent = workflow.compile(checkpointer=memory)
+
+doc_agent = _LazyAgent()
 
 
 # ---------------------------------------------------------------------------
@@ -366,5 +400,5 @@ def run_doc_agent(query: str, thread_id: str = "default") -> AgentDocResponse:
     config = {"configurable": {"thread_id": thread_id}}
     logger.info(f"Agent invoked: thread={thread_id}, query={query[:80]}")
 
-    result = doc_agent.invoke(initial_state, config=config)
+    result = _get_agent().invoke(initial_state, config=config)
     return result["structured_response"]

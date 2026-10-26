@@ -1,27 +1,27 @@
 """Production-grade FastAPI backend with SSE streaming, structured logging, and REST endpoints."""
 
+import asyncio
 import json
+import logging
 import time
 import uuid
-import asyncio
-import logging
 from datetime import datetime, timezone
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 
-from config import settings
 from agent.agent import doc_agent, run_doc_agent
 from agent.schemas import AgentDocResponse
+from config import settings
 from tools.alternative_docs_tool import (
-    _load_yaml,
     _find_badge,
     _format_alternatives,
+    _load_yaml,
     _normalize_key,
 )
-from langchain_core.messages import HumanMessage
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -113,7 +113,7 @@ def health_check():
     try:
         data = _load_yaml()
         health["yaml_badges_loaded"] = len(data.get("badges", []))
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — health check must never crash
         health["yaml_status"] = f"error: {e}"
         health["status"] = "degraded"
 
@@ -135,8 +135,7 @@ def list_badges():
             )
             for b in badges
         ]
-    except Exception as e:
-        logger.error(f"Badge listing failed: {e}")
+    except Exception as e:  # noqa: BLE001 — return 500 for any unexpected failure
         raise _make_error(500, "Failed to load badges", str(e))
 
 
@@ -165,8 +164,7 @@ def get_badge_alternatives(badge_key: str):
         }
     except HTTPException:
         raise
-    except Exception as e:
-        logger.error(f"Badge detail failed: {e}")
+    except Exception as e:  # noqa: BLE001 — return 500 for any unexpected failure
         raise _make_error(500, "Failed to retrieve badge data", str(e))
 
 
@@ -189,8 +187,7 @@ def query_agent(request: QueryRequest):
         return response
     except HTTPException:
         raise
-    except Exception as e:
-        logger.error(f"Query failed | session={session_id} | {e}")
+    except Exception as e:  # noqa: BLE001 — return 500 for any unexpected agent failure
         raise _make_error(500, "Agent execution failed", str(e))
 
 
@@ -302,7 +299,7 @@ async def stream_agent(request: QueryRequest):
                             logger.info(
                                 f"Stream done | session={session_id} | {elapsed}ms"
                             )
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001 — SSE streams must emit error events, not crash
             logger.error(f"Stream error | session={session_id} | {err}")
             yield _sse_event({"event": "error", "message": str(err)})
 

@@ -1,7 +1,7 @@
 """Deterministic YAML-backed alternative document lookup tool with caching."""
 
-import re
 import logging
+import re
 from pathlib import Path
 
 import yaml
@@ -170,8 +170,8 @@ def get_alternative_docs(badge_name: str) -> str:
         data = _load_yaml()
     except FileNotFoundError:
         return "Error: Specification YAML file not found. Please check data/alternative_docs.yaml exists."
-    except Exception as e:
-        return f"Error loading specifications: {str(e)}"
+    except Exception as e:  # noqa: BLE001 — tools return error strings, never raise
+        return f"Error loading specifications: {e!s}"
 
     badges = data.get("badges", [])
     if not badges:

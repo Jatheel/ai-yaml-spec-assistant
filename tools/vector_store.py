@@ -1,13 +1,13 @@
 """Persistent ChromaDB vector store with granular per-alternative-group chunking."""
 
-import os
 import hashlib
 import logging
+import os
 
 import yaml
 from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.documents import Document
+from langchain_huggingface import HuggingFaceEmbeddings
 
 from config import settings
 
@@ -36,7 +36,7 @@ def _needs_rebuild() -> bool:
         with open(HASH_FILE, "r") as f:
             stored_hash = f.read().strip()
         return stored_hash != _compute_yaml_hash()
-    except Exception:
+    except Exception:  # noqa: BLE001 — any I/O failure safely triggers a rebuild
         return True
 
 
