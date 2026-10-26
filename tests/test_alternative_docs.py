@@ -8,6 +8,7 @@ def test_normalize_key():
     assert _normalize_key("") == ""
     assert _normalize_key(None) == ""
 
+
 def test_clean_text_list():
     assert _clean_text_list([" a ", "b", None, ""]) == ["a", "b"]
     assert _clean_text_list([]) == []

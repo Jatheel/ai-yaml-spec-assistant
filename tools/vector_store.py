@@ -13,11 +13,20 @@ from config import settings
 
 logger = logging.getLogger("doc-agent.tools.vectorstore")
 
-_embeddings = HuggingFaceEmbeddings(model_name=settings.embedding_model)
+# Lazy singleton — avoids model download at import time (keeps tests fast)
+_embeddings = None
 
 CHROMA_DIR = str(settings.chroma_dir)
 YAML_PATH = str(settings.yaml_path)
 HASH_FILE = os.path.join(CHROMA_DIR, ".yaml_hash")
+
+
+def _get_embeddings() -> HuggingFaceEmbeddings:
+    """Lazy-initialize embeddings to avoid network/model loading at import time."""
+    global _embeddings
+    if _embeddings is None:
+        _embeddings = HuggingFaceEmbeddings(model_name=settings.embedding_model)
+    return _embeddings
 
 
 def _compute_yaml_hash() -> str:
@@ -33,7 +42,7 @@ def _needs_rebuild() -> bool:
     if not os.path.exists(HASH_FILE):
         return True
     try:
-        with open(HASH_FILE, "r") as f:
+        with open(HASH_FILE) as f:
             stored_hash = f.read().strip()
         return stored_hash != _compute_yaml_hash()
     except Exception:  # noqa: BLE001 — any I/O failure safely triggers a rebuild
@@ -127,11 +136,11 @@ def build_or_get_vectorstore() -> Chroma:
 
     if not _needs_rebuild():
         logger.debug("Loading existing vector store (YAML unchanged)")
-        return Chroma(persist_directory=CHROMA_DIR, embedding_function=_embeddings)
+        return Chroma(persist_directory=CHROMA_DIR, embedding_function=_get_embeddings())
 
     logger.info("Building new vector store from YAML specifications...")
 
-    with open(YAML_PATH, "r", encoding="utf-8") as f:
+    with open(YAML_PATH, encoding="utf-8") as f:
         data = yaml.safe_load(f)
 
     documents = _build_documents(data)
@@ -151,7 +160,7 @@ def build_or_get_vectorstore() -> Chroma:
 
     vectorstore = Chroma.from_documents(
         documents=documents,
-        embedding=_embeddings,
+        embedding=_get_embeddings(),
         persist_directory=CHROMA_DIR,
     )
 
