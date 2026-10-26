@@ -1,6 +1,5 @@
 """Centralized application configuration with Pydantic validation."""
 
-import os
 from pathlib import Path
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
