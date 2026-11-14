@@ -1,6 +1,12 @@
 # AI YAML Specification Assistant
 
+[![CI](https://github.com/Jatheel/ai-yaml-spec-assistant/actions/workflows/python-app.yml/badge.svg)](https://github.com/Jatheel/ai-yaml-spec-assistant/actions/workflows/python-app.yml)
+
 Production-grade documentation intelligence agent that interprets user queries, evaluates YAML specifications, and returns structured API documentation with grounded confidence scoring. The included dataset is a generic, synthetic example for demonstrating YAML-driven tool use.
+
+![Demo: a query streams through the agent pipeline and returns a grounded answer with confidence score, retrieval sources and follow-ups](docs/demo.gif)
+
+*Real run against the local API: the query streams through Init → Agent → Tools → Synthesize, then returns an 85%-confidence answer grounded in an exact YAML badge match.*
 
 ## Key Features
 
@@ -13,29 +19,42 @@ Production-grade documentation intelligence agent that interprets user queries, 
 
 ## Architecture / Pipeline
 
-```text
-Browser chat UI (SSE streaming)
-    |
-    v
-FastAPI (/stream, /query, /badges, /badges/{key}, /health)
-    |
-    v
-LangGraph StateGraph (cyclic)
-    |
-    +---> call_model (agent node)
-    |         |
-    |         +--[tool_calls?]--> ToolNode
-    |         |                      |
-    |         +------<-----<---------+
-    |         |
-    |         +--[no tools]---> synthesize_output
-    |                              |
-    |                              +---> Grounded confidence computation
-    |                              +---> Context-isolated Pydantic formatting
-    |                              +---> AgentDocResponse
-    v
-Groq LLM (llama-3.1-8b-instant)
+```mermaid
+flowchart TD
+    UI["Browser chat UI<br/>frontend/index.html"]
+    API["FastAPI<br/>POST /stream (SSE), POST /query<br/>GET /badges, /badges/{key}, /health"]
+    UI <-- "query in / SSE events out:<br/>start, agent_thinking, tool_result,<br/>synthesizing, complete" --> API
+    API -- "astream / invoke" --> AGENT
+
+    subgraph GRAPH["LangGraph StateGraph + MemorySaver checkpointer (per-session thread)"]
+        AGENT["agent<br/>call_model"]
+        ROUTE{"should_continue<br/>tool_calls? and<br/>iterations &lt; MAX_AGENT_ITERATIONS"}
+        TOOLS["tools<br/>ToolNode"]
+        SYNTH["synthesize<br/>synthesize_output"]
+        AGENT --> ROUTE
+        ROUTE -- "yes" --> TOOLS
+        TOOLS -- "tool outputs" --> AGENT
+        ROUTE -- "no / cap hit" --> SYNTH
+    end
+
+    LLM(["Groq LLM<br/>GROQ_MODEL (default llama-3.1-8b-instant)"])
+    AGENT <-. "tool-calling" .-> LLM
+    SYNTH <-. "structured output<br/>(tool outputs only)" .-> LLM
+    SYNTH --> RESP["AgentDocResponse (Pydantic)<br/>grounded confidence score +<br/>retrieval provenance"]
+
+    subgraph TOOLSET["Tools"]
+        T1["get_alternative_docs<br/>exact YAML lookup"]
+        T2["semantic_docs_search<br/>vector similarity"]
+        T3["list_available_badges"]
+    end
+
+    TOOLS --> T1 & T2 & T3
+    T1 & T3 --> YAML[("data/alternative_docs.yaml")]
+    T2 --> CHROMA[("ChromaDB<br/>all-MiniLM-L6-v2 embeddings")]
+    YAML -. "content-hash rebuild" .-> CHROMA
 ```
+
+**How a query flows:** the `agent` node asks the LLM which tools to call; `ToolNode` runs them and loops back until the model stops requesting tools or the iteration cap (`MAX_AGENT_ITERATIONS`, default 5) is hit. `synthesize` then formats the answer from tool outputs only — no conversation history — and overrides the confidence score with one computed from retrieval signals (exact match vs. semantic match vs. both), so the score is never LLM-generated.
 
 ### Tools
 
