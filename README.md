@@ -28,7 +28,7 @@ flowchart TD
 
     subgraph GRAPH["LangGraph StateGraph + MemorySaver checkpointer (per-session thread)"]
         AGENT["agent<br/>call_model"]
-        ROUTE{"should_continue<br/>tool_calls? and<br/>iterations &lt; 5"}
+        ROUTE{"should_continue<br/>tool_calls? and<br/>iterations &lt; MAX_AGENT_ITERATIONS"}
         TOOLS["tools<br/>ToolNode"]
         SYNTH["synthesize<br/>synthesize_output"]
         AGENT --> ROUTE
